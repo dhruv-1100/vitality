@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Dumbbell, Utensils, Calendar, ShoppingCart, TrendingUp, Map, Download, Upload, X, Check, Database } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, Utensils, Calendar, ShoppingCart, TrendingUp, Map, Compass, Download, Upload, X, Check, Database } from 'lucide-react';
 import { exportUserData, importUserData } from '../utils/storage';
 
 export default function Navbar({ activeTab, setActiveTab }) {
@@ -9,6 +9,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'next', label: 'Next Steps', icon: Compass },
     { id: 'workout', label: 'Workout', icon: Dumbbell },
     { id: 'calendar', label: 'Schedule', icon: Calendar },
     { id: 'diet', label: 'Nutrition', icon: Utensils },

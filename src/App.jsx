@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
+import NextStepsView from './components/NextStepsView';
 import WorkoutTracker from './components/WorkoutTracker';
 import WorkoutCalendar from './components/WorkoutCalendar';
 import DietHub from './components/DietHub';
@@ -10,7 +11,7 @@ import RoadmapView from './components/RoadmapView';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedRoutine, setSelectedRoutine] = useState('Legs A');
+  const [selectedRoutine, setSelectedRoutine] = useState('Push A');
   const [activeScenario, setActiveScenario] = useState('Scenario A');
 
   return (
@@ -24,6 +25,12 @@ export default function App() {
             setSelectedRoutine={setSelectedRoutine}
             activeScenario={activeScenario}
             setActiveScenario={setActiveScenario}
+          />
+        )}
+        {activeTab === 'next' && (
+          <NextStepsView
+            setActiveTab={setActiveTab}
+            setSelectedRoutine={setSelectedRoutine}
           />
         )}
         {activeTab === 'workout' && (
