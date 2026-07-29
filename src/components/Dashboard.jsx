@@ -64,7 +64,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
     forceUpdate(x => x + 1);
   };
 
-  const Ring = ({ pct, color, trackColor = 'rgba(255,255,255,0.08)', size = 100, stroke = 12, children }) => {
+  const Ring = ({ pct, color, trackColor = 'rgba(0,0,0,0.06)', size = 100, stroke = 12, children }) => {
     const r = (size - stroke) / 2;
     const c = 2 * Math.PI * r;
     const offset = c - (Math.min(100, pct) / 100) * c;
@@ -90,10 +90,10 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
       {/* Greeting Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 animate-fade-in">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight font-display">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight font-display">
             {greeting} 👋
           </h1>
-          <p className="text-sm text-slate-400 mt-1 font-medium">
+          <p className="text-sm text-slate-500 mt-1 font-medium">
             {dateLabel} &middot; Week {todayCalendar.weekNum} &middot; Phase 1: Foundation
           </p>
         </div>
@@ -108,22 +108,22 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
       {/* Apple Watch Biometrics Strip */}
       <div className="card !p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
-            <Watch className="w-5 h-5 text-sky-400" />
+          <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
+            <Watch className="w-5 h-5 text-sky-500" />
           </div>
           <div>
-            <p className="text-sm font-bold text-white leading-tight font-display">Apple Watch</p>
-            <p className="text-[11px] text-slate-400">Today's biometrics</p>
+            <p className="text-sm font-bold text-slate-900 leading-tight font-display">Apple Watch</p>
+            <p className="text-[11px] text-slate-400 font-medium">Today's biometrics</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           <span className="pill pill-coral"><Flame className="w-3.5 h-3.5" />{watchData.workoutCalories} kcal</span>
           <span className="pill pill-green"><Activity className="w-3.5 h-3.5" />{watchData.dailyActiveCalories} active</span>
-          <span className="pill pill-rose" style={{ background: 'rgba(244, 63, 94, 0.15)', color: '#fb7185', border: '1px solid rgba(244, 63, 94, 0.3)' }}><Heart className="w-3.5 h-3.5" />{watchData.restingHeartRate} bpm</span>
+          <span className="pill pill-rose" style={{ background: 'rgba(244, 63, 94, 0.12)', color: '#e11d48', border: '1px solid rgba(244, 63, 94, 0.25)' }}><Heart className="w-3.5 h-3.5" />{watchData.restingHeartRate} bpm</span>
           <span className="pill pill-blue"><Footprints className="w-3.5 h-3.5" />{watchData.stepCount.toLocaleString()} steps</span>
           <span className="pill pill-purple"><Moon className="w-3.5 h-3.5" />{watchData.sleepHours}h sleep</span>
-          <button onClick={() => setShowWatchModal(true)} className="pill pill-gray hover:bg-white/10 cursor-pointer transition-colors">
+          <button onClick={() => setShowWatchModal(true)} className="pill pill-gray hover:bg-black/10 cursor-pointer transition-colors">
             <Plus className="w-3.5 h-3.5" />Edit
           </button>
         </div>
@@ -133,27 +133,27 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 animate-fade-in">
         {/* Calories Ring */}
         <div className="card flex items-center gap-6 !p-6">
-          <Ring pct={calPct} color="#10b981" size={100} stroke={12}>
-            <span className="text-xl font-extrabold text-white tabular-nums">{checkedCals}</span>
+          <Ring pct={calPct} color="#22c55e" size={100} stroke={12}>
+            <span className="text-xl font-extrabold text-slate-900 tabular-nums">{checkedCals}</span>
             <span className="text-[10px] text-slate-400 font-semibold -mt-0.5">/ 2800</span>
           </Ring>
           <div className="flex-1">
-            <p className="text-base font-bold text-white font-display">Calories</p>
-            <p className="text-sm text-slate-400 mt-0.5">{2800 - checkedCals} kcal left</p>
-            <p className="text-xs text-emerald-400 font-semibold mt-2">{Math.round(calPct)}% of daily goal</p>
+            <p className="text-base font-bold text-slate-900 font-display">Calories</p>
+            <p className="text-sm text-slate-500 mt-0.5">{2800 - checkedCals} kcal left</p>
+            <p className="text-xs text-emerald-600 font-bold mt-2">{Math.round(calPct)}% of daily goal</p>
           </div>
         </div>
 
         {/* Protein Ring */}
         <div className="card flex items-center gap-6 !p-6">
-          <Ring pct={protPct} color="#f97316" size={100} stroke={12}>
-            <span className="text-xl font-extrabold text-white tabular-nums">{checkedProtein}g</span>
+          <Ring pct={protPct} color="#fb923c" size={100} stroke={12}>
+            <span className="text-xl font-extrabold text-slate-900 tabular-nums">{checkedProtein}g</span>
             <span className="text-[10px] text-slate-400 font-semibold -mt-0.5">/ 150g</span>
           </Ring>
           <div className="flex-1">
-            <p className="text-base font-bold text-white font-display">Protein</p>
-            <p className="text-sm text-slate-400 mt-0.5">{150 - checkedProtein}g left</p>
-            <p className="text-xs text-orange-400 font-semibold mt-2">{Math.round(protPct)}% of daily goal</p>
+            <p className="text-base font-bold text-slate-900 font-display">Protein</p>
+            <p className="text-sm text-slate-500 mt-0.5">{150 - checkedProtein}g left</p>
+            <p className="text-xs text-orange-600 font-bold mt-2">{Math.round(protPct)}% of daily goal</p>
           </div>
         </div>
 
@@ -161,15 +161,15 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
         <div className="card !p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3.5 mb-3">
-              <div className="w-11 h-11 rounded-2xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center">
-                <Dumbbell className="w-5 h-5 text-orange-400" />
+              <div className="w-11 h-11 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+                <Dumbbell className="w-5 h-5 text-orange-500" />
               </div>
               <div>
-                <p className="text-base font-bold text-white font-display">{todayCalendar.session === 'Rest' ? 'Rest Day' : todayCalendar.session}</p>
+                <p className="text-base font-bold text-slate-900 font-display">{todayCalendar.session === 'Rest' ? 'Rest Day' : todayCalendar.session}</p>
                 <p className="text-xs text-slate-400">{todayCalendar.rpe}</p>
               </div>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed">{todayCalendar.notes}</p>
+            <p className="text-sm text-slate-600 leading-relaxed">{todayCalendar.notes}</p>
           </div>
           <button
             onClick={() => { setSelectedRoutine(todayCalendar.session === 'Rest' ? 'Push B' : todayCalendar.session); setActiveTab('workout'); }}
@@ -188,10 +188,10 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
         <div className="card !p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
-                <Scale className="w-5 h-5 text-emerald-400" />
+              <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <Scale className="w-5 h-5 text-emerald-600" />
               </div>
-              <p className="text-base font-bold text-white font-display">Weight</p>
+              <p className="text-base font-bold text-slate-900 font-display">Weight</p>
             </div>
             <span className={`pill text-xs font-bold ${parseFloat(delta) >= 0 ? 'pill-green' : 'pill-coral'}`}>
               {delta > 0 ? '+' : ''}{delta} kg/wk
@@ -199,18 +199,18 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
           </div>
 
           <div className="flex items-baseline gap-2 mb-1">
-            <span className="text-5xl font-extrabold text-white tabular-nums tracking-tight font-display">{latestLog.weightKg}</span>
+            <span className="text-5xl font-extrabold text-slate-900 tabular-nums tracking-tight font-display">{latestLog.weightKg}</span>
             <span className="text-lg text-slate-400 font-semibold">kg</span>
           </div>
-          <p className="text-sm text-slate-400 mb-5">Target: <span className="font-bold text-emerald-400">66.0 kg</span> by December</p>
+          <p className="text-sm text-slate-500 mb-5">Target: <span className="font-bold text-emerald-600">66.0 kg</span> by December</p>
 
-          <div className="w-full bg-slate-800/80 rounded-full h-3 overflow-hidden border border-white/5">
+          <div className="w-full bg-black/5 rounded-full h-3 overflow-hidden border border-black/5">
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
                 width: `${Math.max(3, weightPct)}%`,
-                background: 'linear-gradient(90deg, #34d399, #10b981)',
-                boxShadow: '0 0 12px rgba(16, 185, 129, 0.5)'
+                background: 'linear-gradient(90deg, #4ade80, #22c55e)',
+                boxShadow: '0 0 12px rgba(34, 197, 94, 0.4)'
               }}
             />
           </div>
@@ -222,28 +222,28 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
 
         {/* Log Weight Form */}
         <div className="card !p-6 lg:col-span-3">
-          <p className="text-base font-bold text-white mb-4 flex items-center gap-2 font-display">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+          <p className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2 font-display">
+            <Sparkles className="w-4 h-4 text-emerald-600" />
             Log Weekly Weigh-In
           </p>
           <form onSubmit={handleSaveWeight} className="space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div>
-                <label className="text-xs font-semibold text-slate-400 mb-1.5 block">Week</label>
+                <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Week</label>
                 <select value={selectedWeekNum} onChange={(e) => setSelectedWeekNum(parseInt(e.target.value))} className="input-field text-sm">
                   {Array.from({ length: 21 }, (_, i) => i + 1).map(w => <option key={w} value={w}>Week {w}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-400 mb-1.5 block">Weight (kg)</label>
+                <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Weight (kg)</label>
                 <input type="number" step="0.1" value={weightInput} onChange={(e) => setWeightInput(e.target.value)} className="input-field text-sm" placeholder="59.3" />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-400 mb-1.5 block">Waist (in)</label>
+                <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Waist (in)</label>
                 <input type="number" step="0.1" value={waistInput} onChange={(e) => setWaistInput(e.target.value)} className="input-field text-sm" placeholder="29.1" />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-400 mb-1.5 block">Note</label>
+                <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Note</label>
                 <input type="text" value={weightNote} onChange={(e) => setWeightNote(e.target.value)} placeholder="Optional note" className="input-field text-sm" />
               </div>
             </div>
@@ -253,7 +253,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
             </div>
           </form>
           {saveMsg && (
-            <div className="mt-3 p-3 rounded-xl bg-emerald-950/60 text-emerald-300 text-sm font-semibold text-center border border-emerald-500/30 animate-fade-in">
+            <div className="mt-3 p-3 rounded-xl bg-emerald-50 text-emerald-800 text-sm font-semibold text-center border border-emerald-200 animate-fade-in">
               ✓ Week {selectedWeekNum} weigh-in saved!
             </div>
           )}
@@ -266,18 +266,18 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
         <div className="card !p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
-                <Utensils className="w-5 h-5 text-emerald-400" />
+              <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <Utensils className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-base font-bold text-white font-display">Daily Meals</p>
+                <p className="text-base font-bold text-slate-900 font-display">Daily Meals</p>
                 <p className="text-xs text-slate-400">{mealsChecked}/{timetable.length} meals logged &middot; {checkedCals} kcal</p>
               </div>
             </div>
-            <div className="flex bg-slate-900/80 p-1 rounded-full border border-white/5">
+            <div className="flex bg-black/5 p-1 rounded-full border border-black/5">
               {['Scenario A', 'Scenario B'].map(s => (
                 <button key={s} onClick={() => setActiveScenario(s)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${activeScenario === s ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'text-slate-400 hover:text-white'}`}>
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${activeScenario === s ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>
                   {s === 'Scenario A' ? 'MW' : 'TR'}
                 </button>
               ))}
@@ -293,8 +293,8 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
                   onClick={() => toggleMeal(idx)}
                   className={`flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all border ${
                     checked
-                      ? 'bg-emerald-950/40 border-emerald-500/30 text-slate-300'
-                      : 'bg-slate-900/50 border-slate-800/80 hover:border-slate-700 text-white'
+                      ? 'bg-emerald-500/10 border-emerald-500/25 text-slate-700'
+                      : 'bg-white/60 border-slate-200/60 hover:border-slate-300 text-slate-900'
                   }`}
                 >
                   <div className={`check-circle ${checked ? 'checked' : ''}`}>
@@ -303,12 +303,12 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{meal.time}</span>
-                      <span className={`text-sm font-bold ${checked ? 'text-emerald-400' : 'text-white'}`}>{meal.meal}</span>
+                      <span className={`text-sm font-bold ${checked ? 'text-emerald-700' : 'text-slate-900'}`}>{meal.meal}</span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-0.5 truncate">{meal.detail}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 truncate">{meal.detail}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-bold text-emerald-400">{meal.protein}</p>
+                    <p className="text-sm font-bold text-emerald-600">{meal.protein}</p>
                     <p className="text-[10px] text-slate-400">{meal.cals} kcal</p>
                   </div>
                 </div>
@@ -321,8 +321,8 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
         <div className="space-y-5">
           {/* Supplements */}
           <div className="card !p-6">
-            <p className="text-base font-bold text-white mb-4 flex items-center gap-2 font-display">
-              <Pill className="w-4 h-4 text-sky-400" />
+            <p className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2 font-display">
+              <Pill className="w-4 h-4 text-sky-500" />
               Supplements
             </p>
             <div className="space-y-2.5">
@@ -339,16 +339,16 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
                     onClick={() => toggleSupp(s.key)}
                     className={`w-full flex items-center gap-3.5 p-3.5 rounded-2xl text-left transition-all border ${
                       on
-                        ? 'bg-sky-950/40 border-sky-500/30'
-                        : 'bg-slate-900/50 border-slate-800/80 hover:border-slate-700'
+                        ? 'bg-sky-500/10 border-sky-500/25'
+                        : 'bg-white/60 border-slate-200/60 hover:border-slate-300'
                     }`}
                   >
                     <span className="text-lg">{s.emoji}</span>
                     <div className="flex-1">
-                      <p className={`text-sm font-bold ${on ? 'text-sky-300' : 'text-white'}`}>{s.label}</p>
+                      <p className={`text-sm font-bold ${on ? 'text-sky-800' : 'text-slate-900'}`}>{s.label}</p>
                       <p className="text-[11px] text-slate-400">{s.sub}</p>
                     </div>
-                    <div className={`check-circle ${on ? 'checked' : ''}`} style={on ? { background: '#38bdf8', borderColor: '#38bdf8', boxShadow: '0 0 10px rgba(56,189,248,0.5)' } : {}}>
+                    <div className={`check-circle ${on ? 'checked' : ''}`} style={on ? { background: '#38bdf8', borderColor: '#38bdf8', boxShadow: '0 0 10px rgba(56,189,248,0.4)' } : {}}>
                       {on && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                     </div>
                   </button>
@@ -360,29 +360,29 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
           {/* Water */}
           <div className="card !p-6">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-base font-bold text-white flex items-center gap-2 font-display">
-                <Droplets className="w-4 h-4 text-sky-400" />
+              <p className="text-base font-bold text-slate-900 flex items-center gap-2 font-display">
+                <Droplets className="w-4 h-4 text-sky-500" />
                 Water
               </p>
               <span className="text-xs text-slate-400 font-medium">Goal: 3.5L</span>
             </div>
             <div className="flex items-end justify-between mb-4">
               <div>
-                <span className="text-4xl font-extrabold text-white tabular-nums font-display">{dailyChecklist.waterLitres || 0}</span>
+                <span className="text-4xl font-extrabold text-slate-900 tabular-nums font-display">{dailyChecklist.waterLitres || 0}</span>
                 <span className="text-base text-slate-400 font-medium ml-1">/ 3.5 L</span>
               </div>
               <div className="flex gap-2">
                 <button onClick={() => addWater(-0.5)} className="btn-secondary !text-xs !px-3 !py-2">−0.5L</button>
-                <button onClick={() => addWater(0.5)} className="!text-xs !px-3.5 !py-2 rounded-xl bg-sky-500/20 text-sky-300 font-bold border border-sky-500/30 hover:bg-sky-500/30 transition-all cursor-pointer">+0.5L</button>
+                <button onClick={() => addWater(0.5)} className="!text-xs !px-3.5 !py-2 rounded-xl bg-sky-500/15 text-sky-700 font-bold border border-sky-500/25 hover:bg-sky-500/25 transition-all cursor-pointer">+0.5L</button>
               </div>
             </div>
-            <div className="w-full bg-slate-800/80 rounded-full h-3 overflow-hidden border border-white/5">
+            <div className="w-full bg-black/5 rounded-full h-3 overflow-hidden border border-black/5">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
                   width: `${Math.min(100, ((dailyChecklist.waterLitres || 0) / 3.5) * 100)}%`,
                   background: 'linear-gradient(90deg, #38bdf8, #0284c7)',
-                  boxShadow: '0 0 12px rgba(56, 189, 248, 0.5)'
+                  boxShadow: '0 0 12px rgba(56, 189, 248, 0.4)'
                 }}
               />
             </div>

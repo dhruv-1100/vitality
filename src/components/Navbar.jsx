@@ -42,10 +42,11 @@ export default function Navbar({ activeTab, setActiveTab }) {
     <>
       <header
         style={{
-          background: 'rgba(9, 13, 22, 0.75)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+          background: 'rgba(255, 255, 255, 0.72)',
+          backdropFilter: 'blur(25px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(25px) saturate(180%)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+          boxShadow: '0 4px 20px -4px rgba(0, 0, 0, 0.03)'
         }}
         className="sticky top-0 z-40"
       >
@@ -54,23 +55,23 @@ export default function Navbar({ activeTab, setActiveTab }) {
             {/* Logo */}
             <button className="flex items-center gap-3 group" onClick={() => setActiveTab('dashboard')}>
               <div
-                className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-105"
+                className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-md transition-transform duration-300 group-hover:scale-105"
                 style={{
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)',
-                  border: '1px solid rgba(52, 211, 153, 0.4)'
+                  background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                  boxShadow: '0 4px 15px rgba(34, 197, 94, 0.35)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)'
                 }}
               >
                 <span className="text-white font-extrabold text-base font-display">V</span>
               </div>
               <div className="text-left">
-                <h1 className="text-base font-extrabold text-white leading-none tracking-tight font-display group-hover:text-emerald-400 transition-colors">Vitality</h1>
-                <p className="text-[10px] text-slate-400 font-medium leading-none mt-1 uppercase tracking-wider">Lean Bulk OS</p>
+                <h1 className="text-base font-extrabold text-slate-900 leading-none tracking-tight font-display group-hover:text-green-600 transition-colors">Vitality</h1>
+                <p className="text-[10px] text-slate-400 font-bold leading-none mt-1 uppercase tracking-wider">Lean Bulk OS</p>
               </div>
             </button>
 
-            {/* Desktop Tabs */}
-            <nav className="hidden lg:flex items-center gap-1 bg-slate-900/60 p-1.5 rounded-full border border-white/5">
+            {/* Desktop Segmented Control Tabs */}
+            <nav className="hidden lg:flex items-center gap-1 bg-black/5 p-1.5 rounded-full border border-black/5">
               {tabs.map(tab => {
                 const Icon = tab.icon;
                 const active = activeTab === tab.id;
@@ -80,8 +81,8 @@ export default function Navbar({ activeTab, setActiveTab }) {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 ${
                       active
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
-                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                        ? 'bg-slate-900 text-white shadow-md shadow-slate-900/20'
+                        : 'text-slate-500 hover:text-slate-900 hover:bg-black/5'
                     }`}
                   >
                     <Icon className="w-4 h-4" strokeWidth={active ? 2.5 : 2} />
@@ -94,7 +95,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
             {/* Backup */}
             <button
               onClick={() => setShowBackup(true)}
-              className="w-10 h-10 rounded-2xl flex items-center justify-center bg-slate-900/60 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5 transition-all"
+              className="w-10 h-10 rounded-2xl flex items-center justify-center bg-black/5 text-slate-500 hover:text-slate-900 hover:bg-black/10 transition-all border border-black/5"
               title="Backup & Restore"
             >
               <Database className="w-4 h-4" />
@@ -112,8 +113,8 @@ export default function Navbar({ activeTab, setActiveTab }) {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                     active
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -127,19 +128,19 @@ export default function Navbar({ activeTab, setActiveTab }) {
 
       {/* Backup Modal */}
       {showBackup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/60 backdrop-blur-md animate-fade-in">
-          <div className="card max-w-md w-full !p-6 animate-scale-in" style={{ boxShadow: '0 20px 50px rgba(0,0,0,0.6)' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/30 backdrop-blur-md animate-fade-in">
+          <div className="card max-w-md w-full !p-6 animate-scale-in" style={{ boxShadow: '0 20px 50px rgba(0,0,0,0.15)' }}>
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
-                  <Database className="w-5 h-5 text-emerald-400" />
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                  <Database className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white font-display">Backup & Restore</h3>
+                  <h3 className="text-base font-bold text-slate-900 font-display">Backup & Restore</h3>
                   <p className="text-xs text-slate-400">Data lives in your browser's local storage</p>
                 </div>
               </div>
-              <button onClick={() => setShowBackup(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 text-slate-400">
+              <button onClick={() => setShowBackup(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-black/5 text-slate-400">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -160,14 +161,14 @@ export default function Navbar({ activeTab, setActiveTab }) {
               />
               {importStatus && (
                 <div className={`flex items-center gap-2 p-3 rounded-xl text-sm font-semibold ${
-                  importStatus.ok ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30' : 'bg-red-950/60 text-red-400 border border-red-500/30'
+                  importStatus.ok ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'
                 }`}>
                   {importStatus.ok ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
                   <span>{importStatus.msg}</span>
                 </div>
               )}
               <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setShowBackup(false)} className="text-sm font-medium text-slate-400 hover:text-white px-3 py-2">Cancel</button>
+                <button onClick={() => setShowBackup(false)} className="text-sm font-medium text-slate-400 hover:text-slate-600 px-3 py-2">Cancel</button>
                 <button onClick={handleImport} disabled={!importText.trim()} className="btn-secondary disabled:opacity-40">
                   <Upload className="w-4 h-4" /><span>Restore</span>
                 </button>
