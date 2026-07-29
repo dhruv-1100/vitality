@@ -54,16 +54,11 @@ export default function Navbar({ activeTab, setActiveTab }) {
           <div className="flex items-center justify-between h-[64px]">
             {/* Logo */}
             <button className="flex items-center gap-3 group" onClick={() => setActiveTab('dashboard')}>
-              <div
-                className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-md transition-transform duration-300 group-hover:scale-105"
-                style={{
-                  background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                  boxShadow: '0 4px 15px rgba(34, 197, 94, 0.35)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)'
-                }}
-              >
-                <span className="text-white font-extrabold text-base font-display">V</span>
-              </div>
+              <img
+                src="./vitality_logo.jpg"
+                alt="Vitality Logo"
+                className="w-10 h-10 rounded-2xl object-cover shadow-md transition-transform duration-300 group-hover:scale-105 border border-emerald-500/30"
+              />
               <div className="text-left">
                 <h1 className="text-base font-extrabold text-slate-900 leading-none tracking-tight font-display group-hover:text-green-600 transition-colors">Vitality</h1>
                 <p className="text-[10px] text-slate-400 font-bold leading-none mt-1 uppercase tracking-wider">Lean Bulk OS</p>
