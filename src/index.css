@@ -5,9 +5,9 @@
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
-  --color-primary: #22c55e;
-  --color-primary-dark: #16a34a;
-  --color-coral: #fb923c;
+  --color-primary: #10b981;
+  --color-primary-dark: #059669;
+  --color-coral: #f97316;
   --color-coral-dark: #ea580c;
   --color-sky: #38bdf8;
   --color-sky-dark: #0284c7;
@@ -18,7 +18,7 @@
    ============================================ */
 
 :root {
-  --bg-canvas: #f6f8fa;
+  --bg-canvas: #f4f6f8;
   --text-main: #0f172a;
   --text-sub: #475569;
   --text-muted: #94a3b8;
@@ -26,11 +26,11 @@
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--bg-canvas);
+  background-color: #f4f6f8;
   background-image: 
-    radial-gradient(at 10% 10%, rgba(34, 197, 94, 0.06) 0px, transparent 40%),
-    radial-gradient(at 90% 15%, rgba(56, 189, 248, 0.07) 0px, transparent 40%),
-    radial-gradient(at 50% 85%, rgba(251, 146, 60, 0.05) 0px, transparent 45%);
+    radial-gradient(at 5% 5%, rgba(16, 185, 129, 0.07) 0px, transparent 40%),
+    radial-gradient(at 95% 10%, rgba(56, 189, 248, 0.08) 0px, transparent 40%),
+    radial-gradient(at 50% 90%, rgba(249, 115, 22, 0.06) 0px, transparent 45%);
   background-attachment: fixed;
   color: var(--text-main);
   overflow-x: hidden;
@@ -41,10 +41,10 @@ body {
 
 /* --- Apple Frosted Glass Card --- */
 .card {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(25px) saturate(190%);
+  -webkit-backdrop-filter: blur(25px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: 22px;
   box-shadow: 
     0 4px 20px -2px rgba(0, 0, 0, 0.03),
@@ -55,27 +55,27 @@ body {
   position: relative;
 }
 
-.card:hover {
-  background: rgba(255, 255, 255, 0.88);
+.card:not(.card-hero-green):hover {
+  background: rgba(255, 255, 255, 0.95);
   box-shadow: 
     0 8px 30px -2px rgba(0, 0, 0, 0.05),
-    0 16px 45px -4px rgba(34, 197, 94, 0.08),
+    0 16px 45px -4px rgba(16, 185, 129, 0.1),
     inset 0 1px 0 0 #ffffff;
   transform: translateY(-2px);
-  border-color: rgba(34, 197, 94, 0.3);
+  border-color: rgba(16, 185, 129, 0.35);
 }
 
 .card-hero-green {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.92) 0%, rgba(16, 185, 129, 0.96) 100%);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 12px 35px -5px rgba(34, 197, 94, 0.35);
-  color: #ffffff;
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 12px 35px -5px rgba(5, 150, 105, 0.35) !important;
+  color: #ffffff !important;
 }
+
 .card-hero-green:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 45px -5px rgba(34, 197, 94, 0.45);
+  box-shadow: 0 16px 45px -5px rgba(5, 150, 105, 0.45) !important;
+  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
 }
 
 /* --- Apple Pill Badges --- */
@@ -94,19 +94,19 @@ body {
 }
 
 .pill-green {
-  background: rgba(34, 197, 94, 0.12);
-  color: #15803d;
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
 .pill-coral {
-  background: rgba(251, 146, 60, 0.12);
+  background: rgba(249, 115, 22, 0.12);
   color: #c2410c;
-  border: 1px solid rgba(251, 146, 60, 0.25);
+  border: 1px solid rgba(249, 115, 22, 0.25);
 }
 
 .pill-blue {
-  background: rgba(56, 189, 248, 0.12);
+  background: rgba(56, 189, 248, 0.14);
   color: #0369a1;
   border: 1px solid rgba(56, 189, 248, 0.25);
 }
@@ -123,27 +123,27 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-/* --- Apple Glass Buttons --- */
+/* --- Apple Buttons --- */
 .btn-primary {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: #ffffff;
   font-weight: 700; font-size: 14px; border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.25); cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 }
 .btn-primary:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
 }
 .btn-primary:active { transform: translateY(0) scale(0.98); }
 
 .btn-secondary {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.9);
   color: #0f172a;
   font-weight: 600; font-size: 14px; border-radius: 14px;
   border: 1px solid rgba(0, 0, 0, 0.08); cursor: pointer;
@@ -153,28 +153,28 @@ body {
 }
 .btn-secondary:hover {
   background: #ffffff;
-  border-color: rgba(34, 197, 94, 0.4);
+  border-color: rgba(16, 185, 129, 0.4);
   transform: translateY(-1px);
 }
 
 .btn-coral {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   color: #ffffff;
   font-weight: 700; font-size: 14px; border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.25); cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 15px rgba(251, 146, 60, 0.3);
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
 }
 .btn-coral:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4);
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
 }
 
-/* --- Apple Input Fields --- */
+/* --- Apple Inputs --- */
 .input-field {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 14px;
   padding: 12px 16px;
@@ -187,8 +187,8 @@ body {
 }
 .input-field:focus {
   background: #ffffff;
-  border-color: #22c55e;
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
+  border-color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
 }
 .input-field::placeholder { color: #94a3b8; }
 
@@ -231,13 +231,13 @@ select.input-field {
   flex-shrink: 0;
 }
 .check-circle:hover {
-  border-color: #22c55e;
+  border-color: #10b981;
   transform: scale(1.1);
 }
 .check-circle.checked {
-  background: #22c55e;
-  border-color: #22c55e;
-  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+  background: #10b981;
+  border-color: #10b981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
   transform: scale(1.05);
 }
 
