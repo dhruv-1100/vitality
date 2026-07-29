@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
-import { Utensils, Clock, ChefHat, ChevronDown, ChevronUp, AlertTriangle, Zap, RefreshCw } from 'lucide-react';
-import { MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLE_SCENARIO_B, BATCH_COOKING_SESSIONS, PROTEIN_ROTATIONS, EMERGENCY_MEALS, PRE_WORKOUT_CARBS } from '../utils/transformationData';
+import { Utensils, Clock, ChefHat, ChevronDown, ChevronUp, AlertTriangle, Zap, RefreshCw, CalendarDays } from 'lucide-react';
+import { MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLE_SCENARIO_B, MEAL_TIMETABLE_WEEKEND, MEAL_TIMETABLES_MAP, BATCH_COOKING_SESSIONS, PROTEIN_ROTATIONS, EMERGENCY_MEALS, PRE_WORKOUT_CARBS } from '../utils/transformationData';
 import { getProteinRotation, setProteinRotation } from '../utils/storage';
 
-export default function DietHub({ activeScenario, setActiveScenario }) {
+const WEEKDAYS = [
+  { day: 'Mon', fullName: 'Monday', defaultPlan: 'Scenario A (Mon/Wed Class)' },
+  { day: 'Tue', fullName: 'Tuesday', defaultPlan: 'Scenario B (Tue/Thu Class)' },
+  { day: 'Wed', fullName: 'Wednesday', defaultPlan: 'Scenario A (Mon/Wed Class)' },
+  { day: 'Thu', fullName: 'Thursday', defaultPlan: 'Scenario B (Tue/Thu Class)' },
+  { day: 'Fri', fullName: 'Friday', defaultPlan: 'Weekend / Non-Class Prep' },
+  { day: 'Sat', fullName: 'Saturday', defaultPlan: 'Weekend / Non-Class Prep' },
+  { day: 'Sun', fullName: 'Sunday', defaultPlan: 'Weekend / Non-Class Prep' },
+];
+
+export default function DietHub() {
   const [activeSection, setActiveSection] = useState('schedule');
   const [expandedRecipe, setExpandedRecipe] = useState(null);
   const [currentRotation, setCurrentRotation] = useState(getProteinRotation());
+  const [selectedDayName, setSelectedDayName] = useState('Wed');
+  const [customDayPlans, setCustomDayPlans] = useState({});
 
-  const timetable = activeScenario === 'Scenario A' ? MEAL_TIMETABLE_SCENARIO_A : MEAL_TIMETABLE_SCENARIO_B;
+  const currentDayConfig = WEEKDAYS.find(w => w.day === selectedDayName) || WEEKDAYS[2];
+  const activePlanName = customDayPlans[selectedDayName] || currentDayConfig.defaultPlan;
+  const timetable = MEAL_TIMETABLES_MAP[activePlanName] || MEAL_TIMETABLE_SCENARIO_A;
 
   const sections = [
     { id: 'schedule', label: 'Meal Schedule' },
@@ -22,11 +36,15 @@ export default function DietHub({ activeScenario, setActiveScenario }) {
     setCurrentRotation(r);
   };
 
+  const handlePlanChange = (newPlan) => {
+    setCustomDayPlans(prev => ({ ...prev, [selectedDayName]: newPlan }));
+  };
+
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
+    <div className="space-y-6 animate-fade-in pb-16">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Nutrition</h1>
-        <p className="text-sm text-gray-400 mt-0.5">2,800 kcal · 150g protein · Lacto-vegetarian</p>
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">Nutrition</h1>
+        <p className="text-sm text-slate-500 mt-1 font-medium">2,800 kcal &middot; 150g protein &middot; Lacto-vegetarian</p>
       </div>
 
       {/* Section Tabs */}
@@ -40,51 +58,89 @@ export default function DietHub({ activeScenario, setActiveScenario }) {
 
       {/* Meal Schedule */}
       {activeSection === 'schedule' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-gray-700">Daily Timetable</p>
-            <div className="flex bg-gray-100 p-1 rounded-full">
-              <button onClick={() => setActiveScenario('Scenario A')} className={`px-3 py-1 text-xs font-semibold rounded-full transition-all ${activeScenario === 'Scenario A' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-400'}`}>
-                MW Class
-              </button>
-              <button onClick={() => setActiveScenario('Scenario B')} className={`px-3 py-1 text-xs font-semibold rounded-full transition-all ${activeScenario === 'Scenario B' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-400'}`}>
-                TR Class
-              </button>
+        <div className="space-y-5">
+          {/* Header & Controls */}
+          <div className="card !p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                  <CalendarDays className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-base font-bold text-slate-900 font-display">Weekly Timetable</p>
+                  <p className="text-xs text-slate-400">Select day of week & swap batch prep options</p>
+                </div>
+              </div>
+
+              {/* Plan Swap Dropdown */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Plan:</span>
+                <select
+                  value={activePlanName}
+                  onChange={(e) => handlePlanChange(e.target.value)}
+                  className="input-field !w-auto text-xs font-bold !py-2 !px-3"
+                >
+                  {Object.keys(MEAL_TIMETABLES_MAP).map(planKey => (
+                    <option key={planKey} value={planKey}>{planKey}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Day Selector Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
+              {WEEKDAYS.map(w => {
+                const active = selectedDayName === w.day;
+                return (
+                  <button
+                    key={w.day}
+                    onClick={() => setSelectedDayName(w.day)}
+                    className={`flex-1 min-w-[52px] py-2.5 px-3 rounded-2xl text-xs font-extrabold transition-all border ${
+                      active
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/15 scale-[1.03]'
+                        : 'bg-white/60 text-slate-500 border-slate-200/60 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    {w.day}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="card p-0 overflow-hidden">
+          {/* Timetable List */}
+          <div className="card !p-0 overflow-hidden">
             {timetable.map((meal, idx) => (
-              <div key={idx} className={`flex items-center gap-4 p-4 ${idx > 0 ? 'border-t border-gray-50' : ''}`}>
-                <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
-                  <Clock className="w-4 h-4 text-green-600" />
+              <div key={idx} className={`flex items-center gap-4 p-4 ${idx > 0 ? 'border-t border-slate-100' : ''}`}>
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                  <Clock className="w-4 h-4 text-emerald-600" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-gray-400">{meal.time}</span>
-                    <span className="text-sm font-semibold text-gray-800">{meal.meal}</span>
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{meal.time}</span>
+                    <span className="text-sm font-bold text-slate-900">{meal.meal}</span>
                   </div>
-                  <p className="text-xs text-gray-500 truncate">{meal.detail}</p>
+                  <p className="text-xs text-slate-500 mt-0.5 truncate">{meal.detail}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-xs font-bold text-green-600">{meal.protein}</p>
-                  <p className="text-[10px] text-gray-400">{meal.cals} kcal</p>
+                  <p className="text-sm font-bold text-emerald-600">{meal.protein}</p>
+                  <p className="text-[10px] text-slate-400 font-medium">{meal.cals} kcal</p>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Pre-workout Carbs */}
-          <div className="card p-5">
-            <p className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <div className="card !p-6">
+            <p className="text-base font-bold text-slate-900 mb-3 flex items-center gap-2 font-display">
               <Zap className="w-4 h-4 text-amber-500" />
-              Pre-Workout Fuel Options
+              Pre-Workout Carb Options
             </p>
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {PRE_WORKOUT_CARBS.map((opt, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-amber-50/50 border border-amber-100">
-                  <span className="text-sm">⚡</span>
-                  <span className="text-sm text-gray-700">{opt}</span>
+                <div key={i} className="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                  <span className="text-base">⚡</span>
+                  <span className="text-xs font-semibold text-amber-900">{opt}</span>
                 </div>
               ))}
             </div>
@@ -96,35 +152,35 @@ export default function DietHub({ activeScenario, setActiveScenario }) {
       {activeSection === 'batch' && (
         <div className="space-y-4">
           {BATCH_COOKING_SESSIONS.map(session => (
-            <div key={session.id} className="card p-5">
+            <div key={session.id} className="card !p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center">
-                  <ChefHat className="w-[18px] h-[18px] text-orange-500" />
+                <div className="w-10 h-10 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+                  <ChefHat className="w-5 h-5 text-orange-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-800">{session.title}</p>
-                  <p className="text-xs text-gray-400">~{session.timeEst} total</p>
+                  <p className="text-base font-bold text-slate-900 font-display">{session.title}</p>
+                  <p className="text-xs text-slate-400">~{session.timeEst} total</p>
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {session.recipes.map((recipe, ri) => {
                   const isOpen = expandedRecipe === `${session.id}-${ri}`;
                   return (
-                    <div key={ri} className="border border-gray-100 rounded-xl overflow-hidden">
+                    <div key={ri} className="border border-slate-200/60 rounded-2xl overflow-hidden bg-white/60">
                       <button
                         onClick={() => setExpandedRecipe(isOpen ? null : `${session.id}-${ri}`)}
-                        className="w-full flex items-center justify-between p-3.5 text-left hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 transition-colors"
                       >
                         <div>
-                          <p className="text-sm font-semibold text-gray-800">{recipe.name}</p>
-                          <p className="text-xs text-gray-400">Active: {recipe.activeTime} · Total: {recipe.totalTime}</p>
+                          <p className="text-sm font-bold text-slate-900">{recipe.name}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">Active: {recipe.activeTime} &middot; Total: {recipe.totalTime}</p>
                         </div>
-                        {isOpen ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                        {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
                       </button>
                       {isOpen && (
-                        <div className="px-3.5 pb-3.5 pt-0">
-                          <p className="text-xs text-gray-600 bg-gray-50 p-3 rounded-lg leading-relaxed">{recipe.ingredients}</p>
+                        <div className="px-4 pb-4 pt-0">
+                          <p className="text-xs text-slate-600 bg-slate-50 p-3.5 rounded-xl leading-relaxed border border-slate-100">{recipe.ingredients}</p>
                         </div>
                       )}
                     </div>
@@ -139,7 +195,7 @@ export default function DietHub({ activeScenario, setActiveScenario }) {
       {/* Protein Rotation */}
       {activeSection === 'rotation' && (
         <div className="space-y-4">
-          <p className="text-sm text-gray-500">Rotate protein sources every week to prevent flavor fatigue and ensure micronutrient variety.</p>
+          <p className="text-sm text-slate-500">Rotate protein sources every week to prevent flavor fatigue and ensure micronutrient variety.</p>
           <div className="flex gap-2 mb-4">
             {PROTEIN_ROTATIONS.map(r => (
               <button
@@ -154,14 +210,14 @@ export default function DietHub({ activeScenario, setActiveScenario }) {
           </div>
 
           {PROTEIN_ROTATIONS.filter(r => r.weekLabel === currentRotation).map(r => (
-            <div key={r.weekLabel} className="card p-5 space-y-4">
+            <div key={r.weekLabel} className="card !p-6 space-y-4">
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Sunday Prep (Mon–Wed)</p>
-                <p className="text-sm text-gray-700 bg-green-50 p-3 rounded-xl border border-green-100">{r.session1}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sunday Prep (Mon–Wed)</p>
+                <p className="text-sm font-medium text-emerald-900 bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20">{r.session1}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Thursday Prep (Thu–Sun)</p>
-                <p className="text-sm text-gray-700 bg-orange-50 p-3 rounded-xl border border-orange-100">{r.session2}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Thursday Prep (Thu–Sun)</p>
+                <p className="text-sm font-medium text-orange-900 bg-orange-500/10 p-4 rounded-2xl border border-orange-500/20">{r.session2}</p>
               </div>
             </div>
           ))}
@@ -171,17 +227,17 @@ export default function DietHub({ activeScenario, setActiveScenario }) {
       {/* Emergency Meals */}
       {activeSection === 'emergency' && (
         <div className="space-y-4">
-          <div className="card p-5">
-            <p className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <div className="card !p-6">
+            <p className="text-base font-bold text-slate-900 mb-2 flex items-center gap-2 font-display">
               <AlertTriangle className="w-4 h-4 text-amber-500" />
               Emergency Fallback Meals
             </p>
-            <p className="text-xs text-gray-400 mb-4">When life gets busy. Zero prep, high protein options.</p>
-            <div className="space-y-2">
+            <p className="text-xs text-slate-400 mb-4">When life gets busy. Zero prep, high protein options.</p>
+            <div className="space-y-2.5">
               {EMERGENCY_MEALS.map((meal, i) => (
-                <div key={i} className="p-3.5 rounded-xl bg-amber-50/50 border border-amber-100">
-                  <p className="text-sm font-semibold text-gray-800">{meal.title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{meal.desc}</p>
+                <div key={i} className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                  <p className="text-sm font-bold text-amber-950">{meal.title}</p>
+                  <p className="text-xs text-amber-800 mt-0.5">{meal.desc}</p>
                 </div>
               ))}
             </div>

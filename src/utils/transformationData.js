@@ -210,6 +210,22 @@ export const MEAL_TIMETABLE_SCENARIO_B = [
   { time: "11:15 PM", meal: "Before Bed", detail: "Milk + Almonds / Walnuts", protein: "10g", cals: "350" }
 ];
 
+export const MEAL_TIMETABLE_WEEKEND = [
+  { time: "8:00 AM", meal: "Wake Up & Hydrate", detail: "Water + 1 banana & black coffee", protein: "0g", cals: "100" },
+  { time: "8:30-10:00 AM", meal: "Gym / Training Window", detail: "Weekend session & 1L water hydration", protein: "0g", cals: "0" },
+  { time: "10:30 AM", meal: "Post-Workout Breakfast", detail: "Whey Shake (32g) + Besan Chilla / Paneer Toast", protein: "45g", cals: "550" },
+  { time: "1:30 PM", meal: "Weekend Batch Prep Lunch", detail: "Reheated Pasta or Rice + Rajma / Chana / Paneer", protein: "40g", cals: "750" },
+  { time: "5:30 PM", meal: "Evening Snack", detail: "Greek Yogurt Bowl or Hummus + Pita", protein: "20g", cals: "350" },
+  { time: "8:30 PM", meal: "Dinner", detail: "Reheated Rice container + Tofu Stir-Fry / Dal", protein: "35g", cals: "700" },
+  { time: "11:15 PM", meal: "Bedtime Fuel", detail: "Warm Milk (250ml) + Handful of nuts", protein: "10g", cals: "350" }
+];
+
+export const MEAL_TIMETABLES_MAP = {
+  "Scenario A (Mon/Wed Class)": MEAL_TIMETABLE_SCENARIO_A,
+  "Scenario B (Tue/Thu Class)": MEAL_TIMETABLE_SCENARIO_B,
+  "Weekend / Non-Class Prep": MEAL_TIMETABLE_WEEKEND
+};
+
 export const BATCH_COOKING_SESSIONS = [
   {
     id: "sun_prep",

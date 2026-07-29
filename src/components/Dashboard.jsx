@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
-import { Scale, Dumbbell, Utensils, Droplets, Pill, Flame, ArrowRight, Heart, Footprints, Moon, Watch, Plus, Info, Activity, Sparkles } from 'lucide-react';
-import { AUGUST_CALENDAR, MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLE_SCENARIO_B } from '../utils/transformationData';
+import { Scale, Dumbbell, Utensils, Droplets, Pill, Flame, ArrowRight, Heart, Footprints, Moon, Watch, Plus, Info, Activity, Sparkles, RefreshCw, CalendarDays } from 'lucide-react';
+import { AUGUST_CALENDAR, MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLE_SCENARIO_B, MEAL_TIMETABLE_WEEKEND, MEAL_TIMETABLES_MAP } from '../utils/transformationData';
 import { getWeeklyWeightLogs, saveWeeklyWeightLog, getMealChecks, saveMealCheck, getDailyChecklist, saveDailyChecklist, getAppleWatchLogForDate } from '../utils/storage';
 import AppleWatchModal from './AppleWatchModal';
 
-export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScenario, setActiveScenario }) {
+const WEEKDAYS = [
+  { day: 'Mon', fullName: 'Monday', defaultPlan: 'Scenario A (Mon/Wed Class)' },
+  { day: 'Tue', fullName: 'Tuesday', defaultPlan: 'Scenario B (Tue/Thu Class)' },
+  { day: 'Wed', fullName: 'Wednesday', defaultPlan: 'Scenario A (Mon/Wed Class)' },
+  { day: 'Thu', fullName: 'Thursday', defaultPlan: 'Scenario B (Tue/Thu Class)' },
+  { day: 'Fri', fullName: 'Friday', defaultPlan: 'Weekend / Non-Class Prep' },
+  { day: 'Sat', fullName: 'Saturday', defaultPlan: 'Weekend / Non-Class Prep' },
+  { day: 'Sun', fullName: 'Sunday', defaultPlan: 'Weekend / Non-Class Prep' },
+];
+
+export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
   const [selectedDate, setSelectedDate] = useState('2026-07-29');
   const [selectedWeekNum, setSelectedWeekNum] = useState(1);
   const [weightInput, setWeightInput] = useState('59.3');
@@ -12,6 +22,8 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
   const [weightNote, setWeightNote] = useState('');
   const [saveMsg, setSaveMsg] = useState(false);
   const [showWatchModal, setShowWatchModal] = useState(false);
+  const [customDayPlans, setCustomDayPlans] = useState({});
+  const [selectedDayName, setSelectedDayName] = useState('Wed');
   const [_, forceUpdate] = useState(0);
 
   const weeklyLogs = getWeeklyWeightLogs();
@@ -19,7 +31,11 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
   const dailyChecklist = getDailyChecklist(selectedDate);
   const watchData = getAppleWatchLogForDate(selectedDate);
   const todayCalendar = AUGUST_CALENDAR.find(c => c.date === selectedDate) || { session: 'Rest', weekNum: 1, rpe: '-', notes: 'Recovery day' };
-  const timetable = activeScenario === 'Scenario A' ? MEAL_TIMETABLE_SCENARIO_A : MEAL_TIMETABLE_SCENARIO_B;
+  
+  // Find default plan for selected day
+  const currentDayConfig = WEEKDAYS.find(w => w.day === selectedDayName) || WEEKDAYS[2];
+  const activePlanName = customDayPlans[selectedDayName] || currentDayConfig.defaultPlan;
+  const timetable = MEAL_TIMETABLES_MAP[activePlanName] || MEAL_TIMETABLE_SCENARIO_A;
   const currentMealChecks = mealChecks[selectedDate] || {};
 
   let checkedProtein = 0, checkedCals = 0, mealsChecked = 0;
@@ -62,6 +78,14 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
   const addWater = (d) => {
     saveDailyChecklist(selectedDate, { ...dailyChecklist, waterLitres: Math.max(0, parseFloat(((dailyChecklist.waterLitres || 0) + d).toFixed(1))) });
     forceUpdate(x => x + 1);
+  };
+
+  const handleDaySelect = (dayObj) => {
+    setSelectedDayName(dayObj.day);
+  };
+
+  const handlePlanChange = (newPlan) => {
+    setCustomDayPlans(prev => ({ ...prev, [selectedDayName]: newPlan }));
   };
 
   const Ring = ({ pct, color, trackColor = 'rgba(0,0,0,0.06)', size = 100, stroke = 12, children }) => {
@@ -262,28 +286,56 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine, activeScen
 
       {/* Meals + Supplements */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 animate-fade-in">
-        {/* Meal Checklist */}
+        {/* Full-Week Meal Checklist */}
         <div className="card !p-6 lg:col-span-2">
-          <div className="flex items-center justify-between mb-5">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                 <Utensils className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-base font-bold text-slate-900 font-display">Daily Meals</p>
-                <p className="text-xs text-slate-400">{mealsChecked}/{timetable.length} meals logged &middot; {checkedCals} kcal</p>
+                <p className="text-base font-bold text-slate-900 font-display">Daily Meal Log</p>
+                <p className="text-xs text-slate-400">{mealsChecked}/{timetable.length} logged &middot; {checkedCals} kcal</p>
               </div>
             </div>
-            <div className="flex bg-black/5 p-1 rounded-full border border-black/5">
-              {['Scenario A', 'Scenario B'].map(s => (
-                <button key={s} onClick={() => setActiveScenario(s)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${activeScenario === s ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>
-                  {s === 'Scenario A' ? 'MW' : 'TR'}
-                </button>
-              ))}
+
+            {/* Plan Swap Selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Plan:</span>
+              <select
+                value={activePlanName}
+                onChange={(e) => handlePlanChange(e.target.value)}
+                className="input-field !w-auto text-xs font-bold !py-1.5 !px-3"
+              >
+                {Object.keys(MEAL_TIMETABLES_MAP).map(planKey => (
+                  <option key={planKey} value={planKey}>{planKey}</option>
+                ))}
+              </select>
             </div>
           </div>
 
+          {/* Full Week Day Selector Pills */}
+          <div className="flex items-center gap-1.5 mb-5 overflow-x-auto scrollbar-none pb-1">
+            {WEEKDAYS.map(w => {
+              const active = selectedDayName === w.day;
+              return (
+                <button
+                  key={w.day}
+                  onClick={() => handleDaySelect(w)}
+                  className={`flex-1 min-w-[48px] py-2 px-3 rounded-2xl text-xs font-extrabold transition-all border ${
+                    active
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/15 scale-[1.03]'
+                      : 'bg-white/60 text-slate-500 border-slate-200/60 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                >
+                  {w.day}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Meal List */}
           <div className="space-y-2.5">
             {timetable.map((meal, idx) => {
               const checked = !!currentMealChecks[idx];
