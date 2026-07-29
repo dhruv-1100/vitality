@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Compass, CheckCircle2, Circle, ArrowRight, Calendar, Dumbbell, Utensils, Scale, Watch, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { Compass, CheckCircle2, Circle, ArrowRight, Dumbbell, Utensils, Scale, Watch, Sparkles, ShieldCheck, Zap } from 'lucide-react';
 
 export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
   const [completedSteps, setCompletedSteps] = useState({});
@@ -9,20 +9,20 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
   };
 
   const todayActionItems = [
-    { id: 't1', title: 'Rest & Hydrate Today (Wed 29 July)', desc: 'Hydrate well, aim for 3.5L water, and get 7.5+ hours of sleep tonight.', tag: 'Today' },
-    { id: 't2', title: 'Review Grocery Checklist', desc: 'Ensure you have rice, soy chunks, tofu, paneer, whey, and bananas stocked for the week.', tag: 'Nutrition' },
-    { id: 't3', title: 'Log Today\'s Apple Watch Stats', desc: 'Click "Update" on the Apple Watch bar on the Dashboard to record active calories, resting HR, and sleep.', tag: 'Biometrics' },
+    { id: 't1', title: 'Rest & Hydrate Today (Wed 29 July)', desc: 'Aim for 3.5L water and get 7.5+ hours of sleep tonight.', tag: 'Today' },
+    { id: 't2', title: 'Review Grocery Checklist', desc: 'Ensure rice, soy chunks, tofu, paneer, whey, and bananas are stocked.', tag: 'Nutrition' },
+    { id: 't3', title: 'Log Today\'s Apple Watch Stats', desc: 'Click "Edit" on the Apple Watch bar on Dashboard to log active calories, resting HR, and sleep.', tag: 'Biometrics' },
   ];
 
   const tomorrowWorkoutItems = [
     { id: 'w1', title: 'Gym Time Window: 8:10 AM – 9:40 AM', desc: 'Pre-workout fuel: 1 banana + black coffee at 7:30 AM.' },
     { id: 'w2', title: 'Push A (Chest, Shoulders, Triceps)', desc: 'Re-acclimation session. RPE 6–7. Leave 3–4 reps in reserve on all sets.' },
-    { id: 'w3', title: 'Use the Workout Logger', desc: 'Open the "Workout" tab, select Push A, enter weight & reps for each set, and tap the checkmark.' },
+    { id: 'w3', title: 'Log Your Sets Live', desc: 'Open Workout tab, select Push A, enter weight & reps for each set, and tap checkmark.' },
   ];
 
   const dailyHabits = [
     { time: '7:30 AM', title: 'Pre-Workout Fuel', detail: '1 large banana + black coffee + 500ml water.' },
-    { time: '8:10 AM', title: 'Gym Training', detail: 'Execute workout session. Drink 1L water during workout.' },
+    { time: '8:10 AM', title: 'Gym Training Window', detail: 'Execute workout session. Drink 1L water during workout.' },
     { time: '10:20 AM', title: 'Post-Workout Breakfast', detail: 'Whey Shake (32g protein) + Poha or Besan Chilla.' },
     { time: '1:00 PM', title: 'High-Protein Lunch', detail: 'Reheated Rice + Soy Chunk Curry / Tofu / Dal (40g protein).' },
     { time: '5:00 PM', title: 'Afternoon Snack', detail: 'Whey shake or Hummus + Pita (20g protein).' },
@@ -37,50 +37,54 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in pb-16">
+    <div className="space-y-7 animate-fade-in pb-16">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="pill pill-green text-xs font-bold">Step-by-Step Guide</span>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="pill pill-green text-xs font-bold uppercase tracking-wider">Step-by-Step Guide</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">What To Do Next</h1>
-        <p className="text-sm text-gray-500 mt-1">Your exact daily playbook for a seamless transformation</p>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-display">What To Do Next</h1>
+        <p className="text-sm text-slate-400 mt-1">Your exact daily playbook for a seamless transformation</p>
       </div>
 
       {/* Hero Card: Today's Action */}
-      <div className="card !p-6 bg-gradient-to-br from-emerald-500 to-green-600 text-white border-none shadow-lg">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-            <Zap className="w-5 h-5 text-white" />
+      <div className="card card-hero-emerald !p-7">
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-400/20 border border-emerald-400/30 backdrop-blur-md flex items-center justify-center">
+              <Zap className="w-6 h-6 text-emerald-300" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-widest font-bold text-emerald-300">Step 1 — Today (Wed 29 July)</p>
+              <h2 className="text-2xl font-extrabold text-white font-display">Rest & Reacclimate</h2>
+            </div>
           </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider font-bold text-emerald-100">Step 1 — Today (Wed 29 July)</p>
-            <h2 className="text-xl font-extrabold text-white">Rest & Reacclimate</h2>
-          </div>
+          <span className="pill pill-green text-xs">Today's Priority</span>
         </div>
-        <p className="text-sm text-emerald-50/90 leading-relaxed mb-4">
+
+        <p className="text-sm text-slate-200 leading-relaxed mb-5 font-medium">
           Today is officially set as a Rest Day. Focus on proper hydration (3.5L), getting solid sleep tonight, and reviewing your grocery supplies for tomorrow.
         </p>
 
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {todayActionItems.map(item => {
             const done = !!completedSteps[item.id];
             return (
               <div
                 key={item.id}
                 onClick={() => toggleStep(item.id)}
-                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${
-                  done ? 'bg-white/20 text-white/70 line-through' : 'bg-white/10 hover:bg-white/15 text-white'
+                className={`flex items-center gap-3.5 p-3.5 rounded-xl cursor-pointer transition-all border ${
+                  done
+                    ? 'bg-emerald-950/40 border-emerald-500/30 text-slate-400 line-through'
+                    : 'bg-slate-900/60 border-slate-700/50 hover:border-emerald-400/50 text-white'
                 }`}
               >
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all ${
-                  done ? 'bg-white text-emerald-600 border-white' : 'border-white/60'
-                }`}>
-                  {done && <CheckCircle2 className="w-4 h-4" />}
+                <div className={`check-circle ${done ? 'checked' : ''}`}>
+                  {done && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold">{item.title}</p>
-                  <p className="text-xs text-emerald-100/80 truncate">{item.desc}</p>
+                  <p className="text-sm font-bold text-slate-100">{item.title}</p>
+                  <p className="text-xs text-slate-300/90 truncate">{item.desc}</p>
                 </div>
               </div>
             );
@@ -89,34 +93,34 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
       </div>
 
       {/* Step 2: Tomorrow's Workout */}
-      <div className="card !p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-orange-50 flex items-center justify-center">
-              <Dumbbell className="w-5 h-5 text-orange-500" />
+      <div className="card !p-7">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center">
+              <Dumbbell className="w-6 h-6 text-orange-400" />
             </div>
             <div>
-              <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Step 2 — Tomorrow (Thu 30 July)</p>
-              <h3 className="text-base font-bold text-gray-900">First Gym Workout: Push A</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Step 2 — Tomorrow (Thu 30 July)</p>
+              <h3 className="text-xl font-bold text-white font-display">First Gym Workout: Push A</h3>
             </div>
           </div>
           <button
             onClick={() => { setSelectedRoutine('Push A'); setActiveTab('workout'); }}
-            className="btn-coral text-xs !py-2 !px-3"
+            className="btn-coral text-xs !py-2.5 !px-4"
           >
-            Go to Workout <ArrowRight className="w-3.5 h-3.5" />
+            <span>Go to Workout</span> <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {tomorrowWorkoutItems.map((item, idx) => (
-            <div key={item.id} className="flex items-start gap-3 p-3.5 rounded-xl bg-gray-50/70 border border-gray-100">
-              <div className="w-6 h-6 rounded-full bg-orange-100 text-orange-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+            <div key={item.id} className="flex items-start gap-3.5 p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700 transition-colors">
+              <div className="w-7 h-7 rounded-xl bg-orange-500/20 text-orange-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 border border-orange-500/30">
                 {idx + 1}
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-800">{item.title}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                <p className="text-sm font-bold text-slate-100">{item.title}</p>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">{item.desc}</p>
               </div>
             </div>
           ))}
@@ -124,24 +128,24 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
       </div>
 
       {/* Step 3: Daily Habit Blueprint */}
-      <div className="card !p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-2xl bg-sky-50 flex items-center justify-center">
-            <Utensils className="w-5 h-5 text-sky-500" />
+      <div className="card !p-7">
+        <div className="flex items-center gap-3.5 mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center">
+            <Utensils className="w-6 h-6 text-sky-400" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Step 3 — Daily Routine</p>
-            <h3 className="text-base font-bold text-gray-900">Your Perfect Daily Schedule</h3>
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Step 3 — Daily Routine</p>
+            <h3 className="text-xl font-bold text-white font-display">Your Daily Blueprint</h3>
           </div>
         </div>
 
         <div className="space-y-2">
           {dailyHabits.map((h, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-              <span className="text-xs font-semibold text-gray-400 w-16 shrink-0">{h.time}</span>
+            <div key={i} className="flex items-center gap-4 p-3.5 rounded-xl bg-slate-900/40 border border-slate-800/60 hover:border-sky-500/30 hover:bg-slate-900/70 transition-all">
+              <span className="text-xs font-bold text-sky-400 w-16 shrink-0 tracking-wide">{h.time}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-gray-800">{h.title}</p>
-                <p className="text-xs text-gray-500 truncate">{h.detail}</p>
+                <p className="text-sm font-bold text-slate-200">{h.title}</p>
+                <p className="text-xs text-slate-400 truncate mt-0.5">{h.detail}</p>
               </div>
             </div>
           ))}
@@ -149,43 +153,43 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
       </div>
 
       {/* Step 4: Weekly Protocol */}
-      <div className="card !p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center">
-            <Scale className="w-5 h-5 text-purple-500" />
+      <div className="card !p-7">
+        <div className="flex items-center gap-3.5 mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center">
+            <Scale className="w-6 h-6 text-purple-400" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Step 4 — Weekly Protocol</p>
-            <h3 className="text-base font-bold text-gray-900">Weekly Weigh-In & Batch Prep</h3>
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Step 4 — Weekly Routine</p>
+            <h3 className="text-xl font-bold text-white font-display">Weigh-In & Meal Prep</h3>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {weeklySchedule.map((s, i) => (
-            <div key={i} className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
+            <div key={i} className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-1.5 hover:border-purple-500/30 transition-all">
               <span className="pill pill-purple text-[10px]">{s.day}</span>
-              <p className="text-sm font-bold text-gray-900 pt-1">{s.title}</p>
-              <p className="text-xs text-gray-500 leading-relaxed">{s.detail}</p>
+              <p className="text-sm font-bold text-slate-100 pt-1">{s.title}</p>
+              <p className="text-xs text-slate-400 leading-relaxed">{s.detail}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Golden Rules */}
-      <div className="card !p-6 bg-emerald-50/50 border-emerald-100">
-        <p className="text-base font-bold text-emerald-900 mb-3 flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-emerald-600" />
+      <div className="card !p-7 bg-emerald-950/40 border-emerald-500/30">
+        <p className="text-base font-bold text-emerald-300 mb-3 flex items-center gap-2 font-display">
+          <ShieldCheck className="w-5 h-5 text-emerald-400" />
           The 3 Non-Negotiable Rules
         </p>
-        <ul className="space-y-2 text-xs text-emerald-800">
+        <ul className="space-y-2.5 text-xs text-slate-300">
           <li className="flex items-start gap-2">
-            <span className="font-bold">1. Hit 150g Protein Daily:</span> Whey shake after workout, soy/tofu/paneer at lunch and dinner.
+            <span className="font-bold text-emerald-400">1. Hit 150g Protein Daily:</span> Whey shake after workout, soy/tofu/paneer at lunch and dinner.
           </li>
           <li className="flex items-start gap-2">
-            <span className="font-bold">2. Log Weekly (Not Daily) Weight:</span> Sunday mornings only, after bathroom, before eating.
+            <span className="font-bold text-emerald-400">2. Log Weekly (Not Daily) Weight:</span> Sunday mornings only, after bathroom, before eating.
           </li>
           <li className="flex items-start gap-2">
-            <span className="font-bold">3. Re-acclimation First:</span> Keep Week 1 RPE at 6–7. Protect joints and tendons before pushing max loads in Phase 2.
+            <span className="font-bold text-emerald-400">3. Re-acclimation First:</span> Keep Week 1 RPE at 6–7. Protect joints and tendons before pushing max loads in Phase 2.
           </li>
         </ul>
       </div>
