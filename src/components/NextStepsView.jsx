@@ -55,15 +55,15 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
               <Zap className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-widest font-bold text-emerald-100">Step 1 — Today (Wed 29 July)</p>
-              <h2 className="text-2xl font-extrabold text-white font-display">Rest & Reacclimate</h2>
+              <p className="text-xs uppercase tracking-widest font-bold text-emerald-100">Today (Wed 29 July)</p>
+              <h2 className="text-2xl font-extrabold text-white font-display">Setup & Kitchen Prep Day</h2>
             </div>
           </div>
-          <span className="pill bg-white/20 text-white border border-white/30 text-xs font-bold">Today's Priority</span>
+          <span className="pill bg-white/20 text-white border border-white/30 text-xs font-bold">Setup Only</span>
         </div>
 
         <p className="text-sm text-emerald-50 leading-relaxed mb-5 font-medium">
-          Today is officially set as a Rest Day. Focus on proper hydration (3.5L), getting solid sleep tonight, and reviewing your grocery supplies for tomorrow.
+          Today is your zero-stress setup day. Prep your kitchen, check groceries, hydrate (3.5L), get a great night's sleep (7.5h+), and prepare for Day 1 logging starting tomorrow (Thu 30 July)!
         </p>
 
         <div className="space-y-2.5">

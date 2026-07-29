@@ -15,14 +15,14 @@ const WEEKDAYS = [
 ];
 
 export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
-  const [selectedDate, setSelectedDate] = useState('2026-07-29');
+  const [selectedDate, setSelectedDate] = useState('2026-07-30');
   const [selectedWeekNum, setSelectedWeekNum] = useState(1);
   const [weightInput, setWeightInput] = useState('59.3');
   const [waistInput, setWaistInput] = useState('29.1');
   const [weightNote, setWeightNote] = useState('');
   const [saveMsg, setSaveMsg] = useState(false);
   const [showWatchModal, setShowWatchModal] = useState(false);
-  const [selectedDayName, setSelectedDayName] = useState('Wed');
+  const [selectedDayName, setSelectedDayName] = useState('Thu');
   const [openSwapIdx, setOpenSwapIdx] = useState(null);
   const [_, forceUpdate] = useState(0);
 
