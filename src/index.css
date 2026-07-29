@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-primary: #22c55e;
+  --color-primary-dark: #16a34a;
+  --color-coral: #fb923c;
+  --color-coral-dark: #ea580c;
+  --color-sky: #38bdf8;
+  --color-sky-dark: #0284c7;
+}
+
+/* ============================================
+   VITALITY DESIGN SYSTEM
+   Inspired by Noom, MyFitnessPal, Hevy, Shred
+   ============================================ */
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8f9fa;
+  color: #1a1c1c;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Card System --- */
+.card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 14px rgba(0,0,0,0.03);
+  padding: 20px;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.04);
+}
+
+/* --- Pill Badges --- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1;
+}
+.pill-green { background: #ecfdf5; color: #059669; }
+.pill-coral { background: #fff7ed; color: #c2410c; }
+.pill-blue { background: #eff6ff; color: #0369a1; }
+.pill-rose { background: #fff1f2; color: #be123c; }
+.pill-purple { background: #faf5ff; color: #7c3aed; }
+.pill-gray { background: #f3f4f6; color: #6b7280; }
+
+/* --- Buttons --- */
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 20px; background: #22c55e; color: white;
+  font-weight: 700; font-size: 14px; border-radius: 12px;
+  border: none; cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(34,197,94,0.2), 0 2px 8px rgba(34,197,94,0.1);
+}
+.btn-primary:hover { background: #16a34a; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(34,197,94,0.25); }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 20px; background: white; color: #374151;
+  font-weight: 600; font-size: 14px; border-radius: 12px;
+  border: 1px solid #e5e7eb; cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-secondary:hover { border-color: #d1d5db; background: #f9fafb; }
+
+.btn-coral {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 20px; background: #fb923c; color: white;
+  font-weight: 700; font-size: 14px; border-radius: 12px;
+  border: none; cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(251,146,60,0.25);
+}
+.btn-coral:hover { background: #f97316; transform: translateY(-1px); }
+
+/* --- Inputs --- */
+.input-field {
+  background: #f5f5f5;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  color: #1a1c1c;
+  outline: none;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+.input-field:focus {
+  background: #ffffff;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.08);
+}
+.input-field::placeholder { color: #9ca3af; }
+
+select.input-field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 5.646a.5.5 0 0 1 .708 0L8 8.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+/* --- Tab Pills --- */
+.tab-pill {
+  padding: 7px 16px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  border: none;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+}
+.tab-pill:hover { color: #374151; background: #f3f4f6; }
+.tab-pill.active { background: #1f2937; color: white; }
+
+/* --- Check Circle --- */
+.check-circle {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.check-circle.checked {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+/* --- Progress Ring --- */
+.progress-ring-fill {
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* --- Animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 0.35s cubic-bezier(0.16,1,0.3,1) forwards; }
+.animate-scale-in { animation: scaleIn 0.25s cubic-bezier(0.16,1,0.3,1) forwards; }
+.animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+/* --- Divider --- */
+.divider { height: 1px; background: #f0f0f0; }
+
+/* --- Tabular Numbers --- */
+.tabular-nums { font-variant-numeric: tabular-nums; }
