@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Scale, Dumbbell, Utensils, Droplets, Pill, Flame, ArrowRight, Heart, Footprints, Moon, Watch, Plus, Info, Activity, Sparkles, RefreshCw, CalendarDays } from 'lucide-react';
-import { AUGUST_CALENDAR, MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLE_SCENARIO_B, MEAL_TIMETABLE_WEEKEND, MEAL_TIMETABLES_MAP } from '../utils/transformationData';
-import { getWeeklyWeightLogs, saveWeeklyWeightLog, getMealChecks, saveMealCheck, getDailyChecklist, saveDailyChecklist, getAppleWatchLogForDate } from '../utils/storage';
+import { Scale, Dumbbell, Utensils, Droplets, Pill, Flame, ArrowRight, Heart, Footprints, Moon, Watch, Plus, Info, Activity, Sparkles, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
+import { AUGUST_CALENDAR, MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLE_SCENARIO_B, MEAL_TIMETABLE_WEEKEND, MEAL_TIMETABLES_MAP, TIME_SLOT_ALTERNATIVES } from '../utils/transformationData';
+import { getWeeklyWeightLogs, saveWeeklyWeightLog, getMealChecks, saveMealCheck, getDailyChecklist, saveDailyChecklist, getAppleWatchLogForDate, getSlotSwaps, saveSlotSwap } from '../utils/storage';
 import AppleWatchModal from './AppleWatchModal';
 
 const WEEKDAYS = [
@@ -22,21 +22,37 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
   const [weightNote, setWeightNote] = useState('');
   const [saveMsg, setSaveMsg] = useState(false);
   const [showWatchModal, setShowWatchModal] = useState(false);
-  const [customDayPlans, setCustomDayPlans] = useState({});
   const [selectedDayName, setSelectedDayName] = useState('Wed');
+  const [openSwapIdx, setOpenSwapIdx] = useState(null);
   const [_, forceUpdate] = useState(0);
 
   const weeklyLogs = getWeeklyWeightLogs();
   const mealChecks = getMealChecks();
+  const slotSwaps = getSlotSwaps();
   const dailyChecklist = getDailyChecklist(selectedDate);
   const watchData = getAppleWatchLogForDate(selectedDate);
   const todayCalendar = AUGUST_CALENDAR.find(c => c.date === selectedDate) || { session: 'Rest', weekNum: 1, rpe: '-', notes: 'Recovery day' };
   
-  // Find default plan for selected day
   const currentDayConfig = WEEKDAYS.find(w => w.day === selectedDayName) || WEEKDAYS[2];
-  const activePlanName = customDayPlans[selectedDayName] || currentDayConfig.defaultPlan;
-  const timetable = MEAL_TIMETABLES_MAP[activePlanName] || MEAL_TIMETABLE_SCENARIO_A;
+  const activePlanName = currentDayConfig.defaultPlan;
+  const baseTimetable = MEAL_TIMETABLES_MAP[activePlanName] || MEAL_TIMETABLE_SCENARIO_A;
   const currentMealChecks = mealChecks[selectedDate] || {};
+  const currentDateSwaps = slotSwaps[selectedDate] || {};
+
+  // Build active timetable taking per-slot swaps into account
+  const timetable = baseTimetable.map((baseMeal, idx) => {
+    const swap = currentDateSwaps[idx];
+    if (swap) {
+      return {
+        ...baseMeal,
+        detail: `${swap.name} — ${swap.detail}`,
+        protein: swap.protein,
+        cals: swap.cals,
+        isCustom: true
+      };
+    }
+    return baseMeal;
+  });
 
   let checkedProtein = 0, checkedCals = 0, mealsChecked = 0;
   timetable.forEach((meal, idx) => {
@@ -70,6 +86,18 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
     forceUpdate(x => x + 1);
   };
 
+  const handleSwapChoice = (idx, altOption) => {
+    saveSlotSwap(selectedDate, idx, altOption);
+    setOpenSwapIdx(null);
+    forceUpdate(x => x + 1);
+  };
+
+  const resetSlotSwap = (idx, e) => {
+    e.stopPropagation();
+    saveSlotSwap(selectedDate, idx, null);
+    forceUpdate(x => x + 1);
+  };
+
   const toggleSupp = (key) => {
     saveDailyChecklist(selectedDate, { ...dailyChecklist, [key]: !dailyChecklist[key] });
     forceUpdate(x => x + 1);
@@ -80,12 +108,9 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
     forceUpdate(x => x + 1);
   };
 
-  const handleDaySelect = (dayObj) => {
-    setSelectedDayName(dayObj.day);
-  };
-
-  const handlePlanChange = (newPlan) => {
-    setCustomDayPlans(prev => ({ ...prev, [selectedDayName]: newPlan }));
+  const getAlternativesForSlot = (mealName) => {
+    const key = Object.keys(TIME_SLOT_ALTERNATIVES).find(k => mealName.toLowerCase().includes(k.toLowerCase())) || "Lunch";
+    return TIME_SLOT_ALTERNATIVES[key] || TIME_SLOT_ALTERNATIVES["Lunch"];
   };
 
   const Ring = ({ pct, color, trackColor = 'rgba(0,0,0,0.06)', size = 100, stroke = 12, children }) => {
@@ -286,7 +311,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
 
       {/* Meals + Supplements */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 animate-fade-in">
-        {/* Full-Week Meal Checklist */}
+        {/* Per-Slot Alternative Meal Logging */}
         <div className="card !p-6 lg:col-span-2">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
@@ -295,24 +320,11 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
                 <Utensils className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-base font-bold text-slate-900 font-display">Daily Meal Log</p>
-                <p className="text-xs text-slate-400">{mealsChecked}/{timetable.length} logged &middot; {checkedCals} kcal</p>
+                <p className="text-base font-bold text-slate-900 font-display">Per-Slot Meal Logging</p>
+                <p className="text-xs text-slate-400">{mealsChecked}/{timetable.length} logged &middot; {checkedCals} kcal &middot; {checkedProtein}g protein</p>
               </div>
             </div>
-
-            {/* Plan Swap Selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Plan:</span>
-              <select
-                value={activePlanName}
-                onChange={(e) => handlePlanChange(e.target.value)}
-                className="input-field !w-auto text-xs font-bold !py-1.5 !px-3"
-              >
-                {Object.keys(MEAL_TIMETABLES_MAP).map(planKey => (
-                  <option key={planKey} value={planKey}>{planKey}</option>
-                ))}
-              </select>
-            </div>
+            <span className="pill pill-green text-xs font-bold">Slot Swapping Active</span>
           </div>
 
           {/* Full Week Day Selector Pills */}
@@ -322,7 +334,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
               return (
                 <button
                   key={w.day}
-                  onClick={() => handleDaySelect(w)}
+                  onClick={() => setSelectedDayName(w.day)}
                   className={`flex-1 min-w-[48px] py-2 px-3 rounded-2xl text-xs font-extrabold transition-all border ${
                     active
                       ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/15 scale-[1.03]'
@@ -335,34 +347,90 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
             })}
           </div>
 
-          {/* Meal List */}
-          <div className="space-y-2.5">
+          {/* Per-Slot Meal List */}
+          <div className="space-y-3">
             {timetable.map((meal, idx) => {
               const checked = !!currentMealChecks[idx];
+              const isSwapOpen = openSwapIdx === idx;
+              const alternatives = getAlternativesForSlot(meal.meal);
+              const hasCustomSwap = currentDateSwaps[idx];
+
               return (
                 <div
                   key={idx}
-                  onClick={() => toggleMeal(idx)}
-                  className={`flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all border ${
+                  className={`rounded-2xl border transition-all overflow-hidden ${
                     checked
                       ? 'bg-emerald-500/10 border-emerald-500/25 text-slate-700'
                       : 'bg-white/60 border-slate-200/60 hover:border-slate-300 text-slate-900'
                   }`}
                 >
-                  <div className={`check-circle ${checked ? 'checked' : ''}`}>
-                    {checked && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{meal.time}</span>
-                      <span className={`text-sm font-bold ${checked ? 'text-emerald-700' : 'text-slate-900'}`}>{meal.meal}</span>
+                  {/* Slot Main Row */}
+                  <div className="flex items-center gap-4 p-4 cursor-pointer" onClick={() => toggleMeal(idx)}>
+                    <div className={`check-circle ${checked ? 'checked' : ''}`}>
+                      {checked && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5 truncate">{meal.detail}</p>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{meal.time}</span>
+                        <span className={`text-sm font-bold ${checked ? 'text-emerald-700' : 'text-slate-900'}`}>{meal.meal}</span>
+                        {hasCustomSwap && (
+                          <span className="pill pill-coral text-[10px] !py-0.5 !px-2">Swapped</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 mt-0.5 truncate">{meal.detail}</p>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-emerald-600">{meal.protein}</p>
+                        <p className="text-[10px] text-slate-400">{meal.cals} kcal</p>
+                      </div>
+
+                      {/* Slot Swap Expand Button */}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setOpenSwapIdx(isSwapOpen ? null : idx); }}
+                        className="p-1.5 rounded-xl bg-black/5 hover:bg-black/10 text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1 text-xs font-semibold"
+                        title="Swap meal choice for this slot"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        {isSwapOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-sm font-bold text-emerald-600">{meal.protein}</p>
-                    <p className="text-[10px] text-slate-400">{meal.cals} kcal</p>
-                  </div>
+
+                  {/* Slot Alternatives Accordion */}
+                  {isSwapOpen && (
+                    <div className="border-t border-slate-200/60 bg-slate-50/80 p-4 space-y-2 animate-fade-in">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Choose Alternative Prep Meal for {meal.meal}:</p>
+                        {hasCustomSwap && (
+                          <button
+                            onClick={(e) => resetSlotSwap(idx, e)}
+                            className="text-[11px] font-bold text-rose-600 hover:underline"
+                          >
+                            Reset to Default
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {alternatives.map((alt, ai) => (
+                          <div
+                            key={ai}
+                            onClick={() => handleSwapChoice(idx, alt)}
+                            className="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-emerald-500/50 hover:bg-emerald-50/50 cursor-pointer transition-all space-y-1"
+                          >
+                            <div className="flex items-center justify-between">
+                              <p className="text-xs font-bold text-slate-900">{alt.name}</p>
+                              <span className="text-xs font-bold text-emerald-600">{alt.protein} &middot; {alt.cals} kcal</span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 leading-tight">{alt.detail}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

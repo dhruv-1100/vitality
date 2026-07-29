@@ -150,6 +150,8 @@ export const toggleCalendarDayCompleted = (date) => {
   return updated;
 };
 
+const SLOT_SWAPS_KEY = 'transformation_slot_swaps_v1';
+
 export const getMealChecks = () => {
   const data = localStorage.getItem(MEALS_KEY);
   return data ? JSON.parse(data) : {};
@@ -161,6 +163,19 @@ export const saveMealCheck = (date, mealIdx, isChecked) => {
   checks[date][mealIdx] = isChecked;
   localStorage.setItem(MEALS_KEY, JSON.stringify(checks));
   return checks;
+};
+
+export const getSlotSwaps = () => {
+  const data = localStorage.getItem(SLOT_SWAPS_KEY);
+  return data ? JSON.parse(data) : {};
+};
+
+export const saveSlotSwap = (date, slotIdx, mealObj) => {
+  const swaps = getSlotSwaps();
+  if (!swaps[date]) swaps[date] = {};
+  swaps[date][slotIdx] = mealObj;
+  localStorage.setItem(SLOT_SWAPS_KEY, JSON.stringify(swaps));
+  return swaps;
 };
 
 export const getGroceryChecks = () => {

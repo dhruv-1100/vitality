@@ -226,6 +226,48 @@ export const MEAL_TIMETABLES_MAP = {
   "Weekend / Non-Class Prep": MEAL_TIMETABLE_WEEKEND
 };
 
+export const TIME_SLOT_ALTERNATIVES = {
+  "Wake Up": [
+    { name: "Banana + Coffee", detail: "1 large banana + black coffee", protein: "0g", cals: "100" },
+    { name: "Toast with Jam", detail: "2 slices whole wheat toast + jam", protein: "4g", cals: "180" },
+    { name: "Granola Bar", detail: "1 granola bar + 500ml water", protein: "4g", cals: "140" },
+    { name: "2 Bananas + Coffee", detail: "For heavy volume sessions", protein: "2g", cals: "200" }
+  ],
+  "Breakfast": [
+    { name: "Whey + Poha / Chilla", detail: "Whey Shake (32g) + Poha or Besan Chilla", protein: "45g", cals: "550" },
+    { name: "Whey + Paneer Toast", detail: "Whey Shake (32g) + 2 Paneer toasts", protein: "48g", cals: "580" },
+    { name: "Greek Yogurt Bowl", detail: "200g Greek Yogurt + granola + sliced banana", protein: "25g", cals: "420" },
+    { name: "High-Protein Oatmeal", detail: "Oats cooked in milk + 1 scoop Whey + almonds", protein: "40g", cals: "520" }
+  ],
+  "Lunch": [
+    { name: "Rice + Soy Chunk Curry", detail: "Reheated Rice + Soy Curry (Sunday Prep)", protein: "40g", cals: "750" },
+    { name: "Rice + Tofu Stir-Fry", detail: "Reheated Rice + Tofu & Peppers (Sunday Prep)", protein: "38g", cals: "720" },
+    { name: "Rice + Moong Dal", detail: "Reheated Rice + Spinach Moong Dal", protein: "35g", cals: "680" },
+    { name: "Pasta + Paneer Bhurji", detail: "Whole Wheat Pasta + Paneer Bhurji (Thu Prep)", protein: "42g", cals: "760" },
+    { name: "Rajma Masala + Rice", detail: "Instant Pot Rajma + Reheated Rice (Thu Prep)", protein: "38g", cals: "730" },
+    { name: "Chana Masala + Rice", detail: "Chickpea Curry + Reheated Rice (Thu Prep)", protein: "36g", cals: "710" }
+  ],
+  "Snack": [
+    { name: "Whey Shake + Milk", detail: "1 scoop Whey in 300ml milk", protein: "30g", cals: "250" },
+    { name: "Hummus + Whole Wheat Pita", detail: "3 tbsp hummus + 1 whole wheat pita", protein: "18g", cals: "350" },
+    { name: "PB Bread + Whole Milk", detail: "2 slices toast with peanut butter + milk", protein: "18g", cals: "380" },
+    { name: "Greek Yogurt + Almonds", detail: "Greek yogurt cup + 15 almonds", protein: "20g", cals: "280" }
+  ],
+  "Dinner": [
+    { name: "Rice + Tofu Stir-Fry / Paneer", detail: "Reheated Rice + Tofu Stir-Fry or Paneer", protein: "35g", cals: "700" },
+    { name: "Rice + Soy Chunk Curry", detail: "Reheated Rice + Soy Curry", protein: "40g", cals: "750" },
+    { name: "Pasta + Paneer / Tofu", detail: "Whole Wheat Pasta + Paneer & frozen broccoli", protein: "38g", cals: "720" },
+    { name: "Rajma Masala + Rice", detail: "Reheated Rice + Rajma Masala", protein: "36g", cals: "710" },
+    { name: "Paneer Bhurji + Rotis", detail: "Paneer Bhurji + 2 Whole Wheat Rotis", protein: "35g", cals: "680" }
+  ],
+  "Bedtime": [
+    { name: "Warm Milk + Nuts", detail: "250ml Warm Milk + almonds & walnuts", protein: "10g", cals: "350" },
+    { name: "Greek Yogurt Bowl", detail: "200g Greek Yogurt + chia seeds", protein: "18g", cals: "220" },
+    { name: "Double Whey Shake", detail: "500ml milk + 2 scoops Whey (Quick 60g hit)", protein: "60g", cals: "480" },
+    { name: "Cottage Cheese / Paneer Cube", detail: "100g raw paneer / cottage cheese", protein: "18g", cals: "260" }
+  ]
+};
+
 export const BATCH_COOKING_SESSIONS = [
   {
     id: "sun_prep",
