@@ -151,9 +151,9 @@ export const WORKOUT_ROUTINES = {
 // Starting from July 29 (Today - Rest Day)
 export const AUGUST_CALENDAR = [
   { date: "2026-07-29", dayName: "Wed", session: "Rest", weekNum: 1, rpe: "-", notes: "Rest day & recovery. Hydrate and prepare for tomorrow." },
-  { date: "2026-07-30", dayName: "Thu", session: "Push A", weekNum: 1, rpe: "RPE 6-7 (Re-acclimation)", notes: "Push A session. Leave 3-4 reps in reserve on every set." },
-  { date: "2026-07-31", dayName: "Fri", session: "Pull A", weekNum: 1, rpe: "RPE 6-7", notes: "Form priority, focus on driving elbows down." },
-  { date: "2026-08-01", dayName: "Sat", session: "Push B", weekNum: 1, rpe: "RPE 6-7", notes: "OHP & Chest focus reacclimation." },
+  { date: "2026-07-30", dayName: "Thu", session: "Legs A", weekNum: 1, rpe: "RPE 6-7 (Re-acclimation)", notes: "Legs A session. Barbell squat primary movement. Leave 3-4 reps in reserve." },
+  { date: "2026-07-31", dayName: "Fri", session: "Push B", weekNum: 1, rpe: "RPE 6-7", notes: "Push B session. Overhead press & incline DB press focus." },
+  { date: "2026-08-01", dayName: "Sat", session: "Pull B", weekNum: 1, rpe: "RPE 6-7", notes: "Pull B session. Barbell row & bicep thickness focus." },
   { date: "2026-08-02", dayName: "Sun", session: "Rest", weekNum: 1, rpe: "-", notes: "Weekly Weigh-In Day & Batch Cook Session 1." },
   
   { date: "2026-08-03", dayName: "Mon", session: "Push A", weekNum: 2, rpe: "RPE 7", notes: "Small load increase if form felt solid." },
