@@ -3,6 +3,7 @@ import { Scale, Dumbbell, Utensils, Droplets, Pill, Flame, ArrowRight, Heart, Fo
 import { AUGUST_CALENDAR, MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLE_SCENARIO_B, MEAL_TIMETABLE_WEEKEND, MEAL_TIMETABLES_MAP, TIME_SLOT_ALTERNATIVES } from '../utils/transformationData';
 import { getWeeklyWeightLogs, saveWeeklyWeightLog, getMealChecks, saveMealCheck, getDailyChecklist, saveDailyChecklist, getAppleWatchLogForDate, getSlotSwaps, saveSlotSwap } from '../utils/storage';
 import AppleWatchModal from './AppleWatchModal';
+import MealSlotEditor from './MealSlotEditor';
 
 const WEEKDAYS = [
   { day: 'Mon', fullName: 'Monday', defaultPlan: 'Scenario A (Mon/Wed Class)' },
@@ -399,37 +400,16 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
                     </div>
                   </div>
 
-                  {/* Slot Alternatives Accordion */}
+                  {/* Slot Alternatives & Search / Custom Food Editor */}
                   {isSwapOpen && (
-                    <div className="border-t border-slate-200/60 bg-slate-50/80 p-4 space-y-2 animate-fade-in">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Choose Alternative Prep Meal for {meal.meal}:</p>
-                        {hasCustomSwap && (
-                          <button
-                            onClick={(e) => resetSlotSwap(idx, e)}
-                            className="text-[11px] font-bold text-rose-600 hover:underline"
-                          >
-                            Reset to Default
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {alternatives.map((alt, ai) => (
-                          <div
-                            key={ai}
-                            onClick={() => handleSwapChoice(idx, alt)}
-                            className="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-emerald-500/50 hover:bg-emerald-50/50 cursor-pointer transition-all space-y-1"
-                          >
-                            <div className="flex items-center justify-between">
-                              <p className="text-xs font-bold text-slate-900">{alt.name}</p>
-                              <span className="text-xs font-bold text-emerald-600">{alt.protein} &middot; {alt.cals} kcal</span>
-                            </div>
-                            <p className="text-[11px] text-slate-500 leading-tight">{alt.detail}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                    <MealSlotEditor
+                      meal={meal}
+                      slotIdx={idx}
+                      alternatives={alternatives}
+                      hasCustomSwap={hasCustomSwap}
+                      onSelectMeal={(alt) => handleSwapChoice(idx, alt)}
+                      onResetMeal={(e) => resetSlotSwap(idx, e)}
+                    />
                   )}
                 </div>
               );
