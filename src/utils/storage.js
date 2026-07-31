@@ -66,15 +66,19 @@ export const saveWeeklyWeightLog = (logEntry) => {
 
 export const getWorkoutLogs = () => {
   const data = localStorage.getItem(WORKOUT_KEY);
-  if (!data) {
-    localStorage.setItem(WORKOUT_KEY, JSON.stringify(SEED_WORKOUT_LOGS));
-    return SEED_WORKOUT_LOGS;
+  let logs = {};
+  if (data) {
+    try { logs = JSON.parse(data); } catch (e) { logs = {}; }
   }
-  try {
-    return JSON.parse(data);
-  } catch (e) {
-    return SEED_WORKOUT_LOGS;
+
+  // Auto-migration: Move errant 2026-07-31 workout log to 2026-07-30
+  if (logs['2026-07-31'] && !logs['2026-07-30']) {
+    logs['2026-07-30'] = { ...logs['2026-07-31'], date: '2026-07-30' };
+    delete logs['2026-07-31'];
+    localStorage.setItem(WORKOUT_KEY, JSON.stringify(logs));
   }
+
+  return logs;
 };
 
 export const saveWorkoutLog = (date, workoutData) => {
