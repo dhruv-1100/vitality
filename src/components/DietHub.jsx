@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Utensils, Clock, ChefHat, ChevronDown, ChevronUp, AlertTriangle, Zap, RefreshCw, CalendarDays } from 'lucide-react';
 import { MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLE_SCENARIO_B, MEAL_TIMETABLE_WEEKEND, MEAL_TIMETABLES_MAP, BATCH_COOKING_SESSIONS, PROTEIN_ROTATIONS, EMERGENCY_MEALS, PRE_WORKOUT_CARBS } from '../utils/transformationData';
 import { getProteinRotation, setProteinRotation } from '../utils/storage';
+import GroceryList from './GroceryList';
 
 const WEEKDAYS = [
   { day: 'Mon', fullName: 'Monday', defaultPlan: 'Scenario A (Mon/Wed Class)' },
@@ -26,6 +27,7 @@ export default function DietHub() {
 
   const sections = [
     { id: 'schedule', label: 'Meal Schedule' },
+    { id: 'grocery', label: 'Grocery Checklist' },
     { id: 'batch', label: 'Batch Prep' },
     { id: 'rotation', label: 'Protein Rotation' },
     { id: 'emergency', label: 'Quick Meals' },
@@ -146,6 +148,11 @@ export default function DietHub() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Grocery Checklist Section */}
+      {activeSection === 'grocery' && (
+        <GroceryList />
       )}
 
       {/* Batch Prep */}

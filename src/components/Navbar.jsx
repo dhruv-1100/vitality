@@ -13,7 +13,6 @@ export default function Navbar({ activeTab, setActiveTab }) {
     { id: 'workout', label: 'Workout', icon: Dumbbell },
     { id: 'calendar', label: 'Schedule', icon: Calendar },
     { id: 'diet', label: 'Nutrition', icon: Utensils },
-    { id: 'grocery', label: 'Grocery', icon: ShoppingCart },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp },
     { id: 'roadmap', label: 'Roadmap', icon: Map },
   ];
