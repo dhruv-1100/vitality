@@ -27,8 +27,10 @@ const SEED_WORKOUT_LOGS = {};
 
 const SEED_APPLE_WATCH_LOGS = {
   '2026-07-30': {
+    totalCalories: 2550,
+    activeCalories: 720,
     workoutCalories: 450,
-    dailyActiveCalories: 720,
+    workoutActiveCalories: 390,
     restingHeartRate: 62,
     workoutAvgHeartRate: 138,
     stepCount: 8450,
@@ -111,13 +113,16 @@ export const getAppleWatchLogs = () => {
 
 export const getAppleWatchLogForDate = (date) => {
   const logs = getAppleWatchLogs();
-  return logs[date] || {
-    workoutCalories: 400,
-    dailyActiveCalories: 650,
-    restingHeartRate: 64,
-    workoutAvgHeartRate: 135,
-    stepCount: 8000,
-    sleepHours: 7.5
+  const raw = logs[date] || {};
+  return {
+    totalCalories: raw.totalCalories || 2450,
+    activeCalories: raw.activeCalories || raw.dailyActiveCalories || 720,
+    workoutCalories: raw.workoutCalories || 450,
+    workoutActiveCalories: raw.workoutActiveCalories || 390,
+    restingHeartRate: raw.restingHeartRate || 62,
+    workoutAvgHeartRate: raw.workoutAvgHeartRate || 138,
+    stepCount: raw.stepCount || 8450,
+    sleepHours: raw.sleepHours || 7.5
   };
 };
 

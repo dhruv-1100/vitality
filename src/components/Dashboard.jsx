@@ -168,13 +168,16 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="pill pill-coral"><Flame className="w-3.5 h-3.5" />{watchData.workoutCalories} kcal</span>
-          <span className="pill pill-green"><Activity className="w-3.5 h-3.5" />{watchData.dailyActiveCalories} active</span>
-          <span className="pill pill-rose" style={{ background: 'rgba(244, 63, 94, 0.12)', color: '#e11d48', border: '1px solid rgba(244, 63, 94, 0.25)' }}><Heart className="w-3.5 h-3.5" />{watchData.restingHeartRate} bpm</span>
-          <span className="pill pill-blue"><Footprints className="w-3.5 h-3.5" />{watchData.stepCount.toLocaleString()} steps</span>
-          <span className="pill pill-purple"><Moon className="w-3.5 h-3.5" />{watchData.sleepHours}h sleep</span>
+          <span className="pill pill-coral" title="Total Calories"><Flame className="w-3.5 h-3.5" />Total: {watchData.totalCalories} kcal</span>
+          <span className="pill pill-green" title="Active Calories"><Activity className="w-3.5 h-3.5" />Active: {watchData.activeCalories} kcal</span>
+          <span className="pill pill-amber" style={{ background: 'rgba(245, 158, 11, 0.12)', color: '#d97706', border: '1px solid rgba(245, 158, 11, 0.25)' }} title="Workout Calories"><Flame className="w-3.5 h-3.5" />Workout: {watchData.workoutCalories} kcal</span>
+          <span className="pill pill-orange text-orange-700" style={{ background: 'rgba(234, 88, 12, 0.12)', color: '#c2410c', border: '1px solid rgba(234, 88, 12, 0.25)' }} title="Workout Active Calories"><Activity className="w-3.5 h-3.5" />Wk Active: {watchData.workoutActiveCalories} kcal</span>
+          <span className="pill pill-rose" style={{ background: 'rgba(244, 63, 94, 0.12)', color: '#e11d48', border: '1px solid rgba(244, 63, 94, 0.25)' }} title="Resting Heart Rate"><Heart className="w-3.5 h-3.5" />Rest HR: {watchData.restingHeartRate} bpm</span>
+          <span className="pill pill-pink" style={{ background: 'rgba(236, 72, 153, 0.12)', color: '#db2777', border: '1px solid rgba(236, 72, 153, 0.25)' }} title="Workout Average Heart Rate"><Heart className="w-3.5 h-3.5" />Wk Avg HR: {watchData.workoutAvgHeartRate} bpm</span>
+          <span className="pill pill-blue" title="Daily Steps"><Footprints className="w-3.5 h-3.5" />{watchData.stepCount.toLocaleString()} steps</span>
+          <span className="pill pill-purple" title="Sleep Duration"><Moon className="w-3.5 h-3.5" />{watchData.sleepHours}h sleep</span>
           <button onClick={() => setShowWatchModal(true)} className="pill pill-gray hover:bg-black/10 cursor-pointer transition-colors">
-            <Plus className="w-3.5 h-3.5" />Edit
+            <Plus className="w-3.5 h-3.5" />Edit Stats
           </button>
         </div>
       </div>
