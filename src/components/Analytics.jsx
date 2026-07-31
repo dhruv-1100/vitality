@@ -1,22 +1,38 @@
-import React from 'react';
-import { TrendingUp, Target, AlertCircle, Scale, Ruler } from 'lucide-react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler } from 'chart.js';
-import { getWeeklyWeightLogs } from '../utils/storage';
-import { WEIGHT_CHECKPOINTS } from '../utils/transformationData';
+import React, { useState } from 'react';
+import { TrendingUp, Target, AlertCircle, Scale, Ruler, Flame, Heart, Activity, Footprints, Moon, Dumbbell, Zap, Award, CheckCircle2, BarChart2 } from 'lucide-react';
+import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend, Filler } from 'chart.js';
+import { getWeeklyWeightLogs, getWorkoutLogs, getCompletedCalendarDays, getAppleWatchLogs } from '../utils/storage';
+import { WEIGHT_CHECKPOINTS, PHASES } from '../utils/transformationData';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend, Filler);
 
 export default function Analytics() {
   const logs = getWeeklyWeightLogs();
+  const workoutLogs = getWorkoutLogs();
+  const completedCalendar = getCompletedCalendarDays();
+  const watchLogs = getAppleWatchLogs();
+
   const labels = logs.map(l => `Wk ${l.weekNum}`);
   const weights = logs.map(l => l.weightKg);
   const waists = logs.map(l => l.waistInches);
 
-  // Calculate weekly deltas
+  // Velocity calculations
   const deltas = weights.map((w, i) => i === 0 ? 0 : +(w - weights[i - 1]).toFixed(2));
   const avgGain = weights.length > 1 ? +((weights[weights.length - 1] - weights[0]) / (weights.length - 1)).toFixed(2) : 0;
+  const latestWeight = weights.length > 0 ? weights[weights.length - 1] : 59.3;
+  const latestWaist = waists.length > 0 ? waists[waists.length - 1] : 29.1;
 
+  // Waist-to-height ratio (Height = 175 cm = 68.9 inches)
+  const whtr = +(latestWaist / 68.9).toFixed(2);
+
+  // Gym Completion Rate
+  const totalCompletedSessions = Object.keys(workoutLogs).filter(k => workoutLogs[k].completed).length + completedCalendar.length;
+  const adherenceRate = Math.min(100, Math.round((totalCompletedSessions / 5) * 100)); // Target ~5 sessions/week
+
+  const gainStatus = avgGain >= 0.15 && avgGain <= 0.35 ? 'on-track' : avgGain < 0.15 ? 'slow' : 'fast';
+
+  // 1. Weight Chart Data
   const weightChartData = {
     labels,
     datasets: [
@@ -24,17 +40,18 @@ export default function Analytics() {
         label: 'Weight (kg)',
         data: weights,
         borderColor: '#22c55e',
-        backgroundColor: 'rgba(34, 197, 94, 0.08)',
+        backgroundColor: 'rgba(34, 197, 94, 0.12)',
         fill: true,
         tension: 0.4,
         pointBackgroundColor: '#22c55e',
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        borderWidth: 2.5,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        borderWidth: 3,
       },
     ],
   };
 
+  // 2. Waist Chart Data
   const waistChartData = {
     labels,
     datasets: [
@@ -42,15 +59,47 @@ export default function Analytics() {
         label: 'Waist (inches)',
         data: waists,
         borderColor: '#38bdf8',
-        backgroundColor: 'rgba(56, 189, 248, 0.08)',
+        backgroundColor: 'rgba(56, 189, 248, 0.12)',
         fill: true,
         tension: 0.4,
         pointBackgroundColor: '#38bdf8',
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        borderWidth: 2.5,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        borderWidth: 3,
       },
     ],
+  };
+
+  // 3. Apple Watch Telemetry Bar Chart
+  const watchDates = Object.keys(watchLogs).slice(-7);
+  const watchBarData = {
+    labels: watchDates.length > 0 ? watchDates.map(d => d.split('-').slice(1).join('/')) : ['Thu 7/30'],
+    datasets: [
+      {
+        label: 'Active Cals (kcal)',
+        data: watchDates.length > 0 ? watchDates.map(d => watchLogs[d]?.activeCalories || watchLogs[d]?.dailyActiveCalories || 720) : [720],
+        backgroundColor: '#22c55e',
+        borderRadius: 8,
+      },
+      {
+        label: 'Workout Burn (kcal)',
+        data: watchDates.length > 0 ? watchDates.map(d => watchLogs[d]?.workoutCalories || 450) : [450],
+        backgroundColor: '#f97316',
+        borderRadius: 8,
+      }
+    ]
+  };
+
+  // 4. Macro Ratio Doughnut Chart
+  const macroDoughnutData = {
+    labels: ['Protein (150g)', 'Carbs (350g)', 'Fats (85g)'],
+    datasets: [
+      {
+        data: [600, 1400, 765], // 600 kcal from P, 1400 from C, 765 from F = ~2765 kcal
+        backgroundColor: ['#fb923c', '#38bdf8', '#34d399'],
+        borderWidth: 0,
+      }
+    ]
   };
 
   const chartOptions = (unit) => ({
@@ -59,11 +108,11 @@ export default function Analytics() {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#1a1c1c',
-        titleFont: { family: 'Inter', size: 12 },
+        backgroundColor: '#0f172a',
+        titleFont: { family: 'Inter', size: 12, weight: 'bold' },
         bodyFont: { family: 'Inter', size: 12 },
-        padding: 10,
-        cornerRadius: 8,
+        padding: 12,
+        cornerRadius: 12,
         displayColors: false,
         callbacks: {
           label: (ctx) => `${ctx.parsed.y} ${unit}`,
@@ -71,98 +120,231 @@ export default function Analytics() {
       },
     },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11, weight: '500' }, color: '#9ca3af' } },
-      y: { grid: { color: '#f5f5f5' }, ticks: { font: { family: 'Inter', size: 11, weight: '500' }, color: '#9ca3af' } },
+      x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#64748b' } },
+      y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#64748b' } },
     },
   });
 
-  const gainStatus = avgGain >= 0.15 && avgGain <= 0.30 ? 'on-track' : avgGain < 0.15 ? 'slow' : 'fast';
-
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
+    <div className="space-y-7 animate-fade-in pb-16">
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Analytics</h1>
-        <p className="text-sm text-gray-400 mt-0.5">Weekly progress tracking & gain velocity</p>
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">Analytics & Insights</h1>
+        <p className="text-sm text-slate-500 mt-1 font-medium">Biometric trends, gain velocity, and training volume</p>
       </div>
 
-      {/* Gain Velocity Status */}
-      <div className={`card p-5 border-l-4 ${
-        gainStatus === 'on-track' ? 'border-l-green-500 bg-green-50/30' :
-        gainStatus === 'slow' ? 'border-l-amber-500 bg-amber-50/30' :
-        'border-l-red-500 bg-red-50/30'
+      {/* Overview Stat Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="card !p-5">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <Scale className="w-4 h-4 text-emerald-600" />
+            </div>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Current Weight</span>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-3xl font-extrabold text-slate-900 font-display tabular-nums">{latestWeight}</span>
+            <span className="text-sm font-bold text-slate-400">kg</span>
+          </div>
+          <p className="text-[11px] text-emerald-600 font-bold mt-1">Goal: 66.0 kg by Dec</p>
+        </div>
+
+        <div className="card !p-5">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+              <Ruler className="w-4 h-4 text-sky-500" />
+            </div>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Waist Line</span>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-3xl font-extrabold text-slate-900 font-display tabular-nums">{latestWaist}"</span>
+            <span className="text-xs text-sky-600 font-bold">({whtr} WHtR)</span>
+          </div>
+          <p className="text-[11px] text-slate-400 font-medium mt-1">Optimal lean bulk ratio: &lt; 0.46</p>
+        </div>
+
+        <div className="card !p-5">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+              <Dumbbell className="w-4 h-4 text-orange-500" />
+            </div>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Completed Sessions</span>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-3xl font-extrabold text-slate-900 font-display tabular-nums">{totalCompletedSessions}</span>
+            <span className="text-sm font-bold text-slate-400">workouts</span>
+          </div>
+          <p className="text-[11px] text-orange-600 font-bold mt-1">{adherenceRate}% Weekly Goal</p>
+        </div>
+
+        <div className="card !p-5">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-purple-500" />
+            </div>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Gain Rate</span>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-3xl font-extrabold text-slate-900 font-display tabular-nums">+{avgGain}</span>
+            <span className="text-sm font-bold text-slate-400">kg/wk</span>
+          </div>
+          <p className="text-[11px] text-purple-600 font-bold mt-1">Target: +0.25 kg/wk</p>
+        </div>
+      </div>
+
+      {/* Gain Velocity Status Banner */}
+      <div className={`card !p-5 border-l-4 ${
+        gainStatus === 'on-track' ? 'border-l-emerald-500 bg-emerald-500/10' :
+        gainStatus === 'slow' ? 'border-l-amber-500 bg-amber-500/10' :
+        'border-l-rose-500 bg-rose-500/10'
       }`}>
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-            gainStatus === 'on-track' ? 'bg-green-100' : gainStatus === 'slow' ? 'bg-amber-100' : 'bg-red-100'
+        <div className="flex items-center gap-3.5">
+          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
+            gainStatus === 'on-track' ? 'bg-emerald-500/20 text-emerald-600' :
+            gainStatus === 'slow' ? 'bg-amber-500/20 text-amber-600' : 'bg-rose-500/20 text-rose-600'
           }`}>
-            {gainStatus === 'on-track' ? <Target className="w-5 h-5 text-green-600" /> :
-             <AlertCircle className="w-5 h-5 text-amber-600" />}
+            {gainStatus === 'on-track' ? <Target className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
           </div>
           <div>
-            <p className="text-sm font-bold text-gray-800">
-              {gainStatus === 'on-track' ? 'On Track — Gaining at healthy rate' :
-               gainStatus === 'slow' ? 'Gaining slowly — Consider adding 100-200 kcal' :
-               'Gaining fast — May be adding excess fat'}
+            <p className="text-base font-bold text-slate-900 font-display">
+              {gainStatus === 'on-track' ? 'Lean Bulk Velocity: Optimal (+0.25 kg/wk)' :
+               gainStatus === 'slow' ? 'Velocity: Slight Slow Gain (Consider +150 kcal)' :
+               'Velocity: High Surplus (Monitor waist measurement)'}
             </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Avg weekly gain: <span className="font-bold">{avgGain > 0 ? '+' : ''}{avgGain} kg/week</span> · Target: +0.15 to +0.30 kg/week
+            <p className="text-xs text-slate-500 mt-0.5 font-medium">
+              Average rate: <span className="font-bold text-slate-900">+{avgGain} kg/week</span> &middot; Target range: <span className="font-bold text-emerald-600">+0.20 to +0.35 kg/week</span> for clean muscle growth.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Weight Chart */}
-      <div className="card p-5">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
-            <Scale className="w-4 h-4 text-green-500" />
-            Weight Progress
-          </p>
-          <span className="pill pill-green text-xs">
-            {weights.length > 0 ? `${weights[weights.length - 1]} kg` : '—'}
-          </span>
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Weight Progress Chart */}
+        <div className="card !p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <Scale className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-base font-bold text-slate-900 font-display">Weight Curve (kg)</p>
+                <p className="text-xs text-slate-400">Baseline 59.0 kg &rarr; Goal 66.0 kg</p>
+              </div>
+            </div>
+            <span className="pill pill-green text-xs font-bold">{latestWeight} kg</span>
+          </div>
+          <div className="h-64">
+            <Line data={weightChartData} options={chartOptions('kg')} />
+          </div>
         </div>
-        <div className="h-64">
-          <Line data={weightChartData} options={chartOptions('kg')} />
+
+        {/* Waist Measurement Chart */}
+        <div className="card !p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+                <Ruler className="w-5 h-5 text-sky-500" />
+              </div>
+              <div>
+                <p className="text-base font-bold text-slate-900 font-display">Waist Tightness (inches)</p>
+                <p className="text-xs text-slate-400">Maintains waist stability during surplus</p>
+              </div>
+            </div>
+            <span className="pill pill-blue text-xs font-bold">{latestWaist}"</span>
+          </div>
+          <div className="h-64">
+            <Line data={waistChartData} options={chartOptions('in')} />
+          </div>
         </div>
       </div>
 
-      {/* Waist Chart */}
-      <div className="card p-5">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
-            <Ruler className="w-4 h-4 text-blue-500" />
-            Waist Measurement
-          </p>
-          <span className="pill pill-blue text-xs">
-            {waists.length > 0 ? `${waists[waists.length - 1]}"` : '—'}
-          </span>
+      {/* Apple Watch Telemetry & Macro Distribution */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Apple Watch Telemetry Bar Chart */}
+        <div className="card !p-6 lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+                <Flame className="w-5 h-5 text-orange-500" />
+              </div>
+              <div>
+                <p className="text-base font-bold text-slate-900 font-display">Apple Watch Active & Workout Burn</p>
+                <p className="text-xs text-slate-400">Daily Active Calories vs Workout Active Burn</p>
+              </div>
+            </div>
+          </div>
+          <div className="h-60">
+            <Bar
+              data={watchBarData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: true, position: 'top', labels: { font: { family: 'Inter', size: 11, weight: '600' } } } },
+                scales: {
+                  x: { grid: { display: false } },
+                  y: { grid: { color: 'rgba(0,0,0,0.04)' } }
+                }
+              }}
+            />
+          </div>
         </div>
-        <div className="h-64">
-          <Line data={waistChartData} options={chartOptions('in')} />
+
+        {/* Macro Energy Breakdown */}
+        <div className="card !p-6 flex flex-col justify-between">
+          <div>
+            <p className="text-base font-bold text-slate-900 mb-1 font-display flex items-center gap-2">
+              <Zap className="w-4 h-4 text-amber-500" />
+              Macro Calorie Ratio
+            </p>
+            <p className="text-xs text-slate-400 mb-4">2,800 kcal &middot; 150g protein goal</p>
+            <div className="h-44 flex items-center justify-center">
+              <Doughnut
+                data={macroDoughnutData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { display: false } }
+                }}
+              />
+            </div>
+          </div>
+          <div className="space-y-2 mt-4">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+              <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-orange-400" /> Protein</span>
+              <span>150g (600 kcal) &middot; 22%</span>
+            </div>
+            <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+              <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-sky-400" /> Carbs</span>
+              <span>350g (1400 kcal) &middot; 50%</span>
+            </div>
+            <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+              <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-emerald-400" /> Healthy Fats</span>
+              <span>85g (765 kcal) &middot; 28%</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Weight Checkpoints */}
-      <div className="card p-5">
-        <p className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-green-500" />
-          Target Checkpoints
+      {/* Target Checkpoints */}
+      <div className="card !p-6">
+        <p className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2 font-display">
+          <TrendingUp className="w-4 h-4 text-emerald-600" />
+          Lean Bulk Weight Checkpoints
         </p>
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {WEIGHT_CHECKPOINTS.map((cp, i) => {
-            const current = weights.length > 0 ? weights[weights.length - 1] : 59;
-            const hit = current >= cp.targetKg;
+            const hit = latestWeight >= cp.targetKg;
             return (
-              <div key={i} className={`flex items-center gap-4 p-3.5 rounded-xl ${hit ? 'bg-green-50 border border-green-100' : 'bg-gray-50'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${hit ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
-                  {hit ? '✓' : i + 1}
+              <div key={i} className={`p-4 rounded-2xl border transition-all ${hit ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white/60 border-slate-200/60'}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold ${hit ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'}`}>
+                    {hit ? '✓' : i + 1}
+                  </span>
+                  <span className={`text-sm font-extrabold ${hit ? 'text-emerald-600' : 'text-slate-900'}`}>{cp.targetKg} kg</span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-800">{cp.week} — {cp.month}</p>
-                  <p className="text-xs text-gray-500">{cp.note}</p>
-                </div>
-                <span className={`text-sm font-bold ${hit ? 'text-green-600' : 'text-gray-400'}`}>{cp.targetKg} kg</span>
+                <p className="text-xs font-bold text-slate-900">{cp.week} &middot; {cp.month}</p>
+                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">{cp.note}</p>
               </div>
             );
           })}
