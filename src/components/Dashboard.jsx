@@ -432,8 +432,9 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
               {[
                 { key: 'creatine', label: 'Creatine 5g', sub: 'Monohydrate — Daily non-negotiable', emoji: '💪' },
                 { key: 'b12', label: 'Vitamin B12 (1 Gummy Daily)', sub: '1 gummy daily with meal', emoji: '🍬' },
-                { key: 'd3', label: 'Vitamin D3 (60,000 IU Tablet)', sub: '1 tablet ONCE a week (Sunday with fat)', emoji: '☀️' },
-                { key: 'healthy_fats', label: 'Whole Food Omega-3 Fats', sub: 'Walnuts, almonds, chia & flax seeds', emoji: '🥜' },
+                ...(selectedDayName === 'Sun' || new Date(selectedDate + 'T12:00:00').getDay() === 0 ? [
+                  { key: 'd3', label: 'Vitamin D3 (60,000 IU Tablet)', sub: '1 tablet ONCE a week (Sunday with fat)', emoji: '☀️' }
+                ] : [])
               ].map(s => {
                 const on = !!dailyChecklist[s.key];
                 return (
