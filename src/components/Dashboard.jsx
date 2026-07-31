@@ -273,41 +273,60 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
           </div>
         </div>
 
-        {/* Log Weight Form */}
-        <div className="card !p-6 lg:col-span-3">
-          <p className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2 font-display">
-            <Sparkles className="w-4 h-4 text-emerald-600" />
-            Log Weekly Weigh-In
-          </p>
-          <form onSubmit={handleSaveWeight} className="space-y-4">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div>
-                <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Week</label>
-                <select value={selectedWeekNum} onChange={(e) => setSelectedWeekNum(parseInt(e.target.value))} className="input-field text-sm">
-                  {Array.from({ length: 21 }, (_, i) => i + 1).map(w => <option key={w} value={w}>Week {w}</option>)}
-                </select>
+        {/* Log Weight Form (Shows ONLY on Sundays) */}
+        <div className="card !p-6 lg:col-span-3 flex flex-col justify-between">
+          {(selectedDayName === 'Sun' || new Date(selectedDate + 'T12:00:00').getDay() === 0) ? (
+            <>
+              <p className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2 font-display">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                Log Weekly Sunday Weigh-In
+              </p>
+              <form onSubmit={handleSaveWeight} className="space-y-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Week</label>
+                    <select value={selectedWeekNum} onChange={(e) => setSelectedWeekNum(parseInt(e.target.value))} className="input-field text-sm">
+                      {Array.from({ length: 21 }, (_, i) => i + 1).map(w => <option key={w} value={w}>Week {w}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Weight (kg)</label>
+                    <input type="number" step="0.1" value={weightInput} onChange={(e) => setWeightInput(e.target.value)} className="input-field text-sm" placeholder="59.3" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Waist (in)</label>
+                    <input type="number" step="0.1" value={waistInput} onChange={(e) => setWaistInput(e.target.value)} className="input-field text-sm" placeholder="29.1" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Note</label>
+                    <input type="text" value={weightNote} onChange={(e) => setWeightNote(e.target.value)} placeholder="Optional note" className="input-field text-sm" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-slate-400 flex items-center gap-1"><Info className="w-3.5 h-3.5" /> Sunday morning, before eating</p>
+                  <button type="submit" className="btn-primary">Save Weigh-In</button>
+                </div>
+              </form>
+              {saveMsg && (
+                <div className="mt-3 p-3 rounded-xl bg-emerald-50 text-emerald-800 text-sm font-semibold text-center border border-emerald-200 animate-fade-in">
+                  ✓ Week {selectedWeekNum} weigh-in saved!
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-col justify-center h-full space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
+                  <Scale className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-base font-bold text-slate-900 font-display">Sunday Weigh-In Protocol</p>
+                  <p className="text-xs text-slate-400">Weekly weigh-in box unlocks every Sunday morning</p>
+                </div>
               </div>
-              <div>
-                <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Weight (kg)</label>
-                <input type="number" step="0.1" value={weightInput} onChange={(e) => setWeightInput(e.target.value)} className="input-field text-sm" placeholder="59.3" />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Waist (in)</label>
-                <input type="number" step="0.1" value={waistInput} onChange={(e) => setWaistInput(e.target.value)} className="input-field text-sm" placeholder="29.1" />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Note</label>
-                <input type="text" value={weightNote} onChange={(e) => setWeightNote(e.target.value)} placeholder="Optional note" className="input-field text-sm" />
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-slate-400 flex items-center gap-1"><Info className="w-3.5 h-3.5" /> Sunday morning, before eating</p>
-              <button type="submit" className="btn-primary">Save Weigh-In</button>
-            </div>
-          </form>
-          {saveMsg && (
-            <div className="mt-3 p-3 rounded-xl bg-emerald-50 text-emerald-800 text-sm font-semibold text-center border border-emerald-200 animate-fade-in">
-              ✓ Week {selectedWeekNum} weigh-in saved!
+              <p className="text-xs text-slate-500 leading-relaxed bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/50">
+                💡 To prevent daily fluid fluctuation anxiety, official weigh-in logging opens strictly on <strong>Sunday mornings</strong> immediately after waking up and using the bathroom (before eating/drinking).
+              </p>
             </div>
           )}
         </div>
