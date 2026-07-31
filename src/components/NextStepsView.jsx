@@ -1,53 +1,113 @@
 import React, { useState } from 'react';
-import { Compass, CheckCircle2, Circle, ArrowRight, Dumbbell, Utensils, Scale, Watch, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { Compass, CheckCircle2, Circle, ArrowRight, Dumbbell, Utensils, Scale, Watch, Sparkles, ShieldCheck, Zap, Calendar, ChefHat } from 'lucide-react';
+import { AUGUST_CALENDAR, MEAL_TIMETABLES_MAP } from '../utils/transformationData';
+import { getLocalDateString } from '../utils/storage';
 
 export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
+  const [selectedDate, setSelectedDate] = useState('2026-07-30');
   const [completedSteps, setCompletedSteps] = useState({});
+
+  const dayCalendar = AUGUST_CALENDAR.find(c => c.date === selectedDate) || {
+    date: selectedDate,
+    dayName: 'Thu',
+    session: 'Legs A',
+    weekNum: 1,
+    rpe: 'RPE 6-7',
+    notes: 'Execute workout session with high technical quality.'
+  };
+
+  const isRest = dayCalendar.session === 'Rest';
+  const isSunday = dayCalendar.dayName === 'Sun';
+  const dateObj = new Date(selectedDate + 'T12:00:00');
+  const dateLabel = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   const toggleStep = (id) => {
     setCompletedSteps(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const todayActionItems = [
-    { id: 't1', title: 'Rest & Hydrate Today (Wed 29 July)', desc: 'Aim for 3.5L water and get 7.5+ hours of sleep tonight.' },
-    { id: 't2', title: 'Review Grocery Checklist', desc: 'Ensure rice, soy chunks, tofu, paneer, whey, and bananas are stocked.' },
-    { id: 't3', title: 'Log Today\'s Apple Watch Stats', desc: 'Click "Edit" on the Apple Watch bar on Dashboard to log active calories, resting HR, and sleep.' },
+  // Generate dynamic date-specific action items
+  const dynamicActionItems = [
+    {
+      id: `${selectedDate}-act1`,
+      category: 'Workout',
+      icon: Dumbbell,
+      title: isRest ? `Rest & Active Recovery` : `Execute ${dayCalendar.session} Workout`,
+      desc: isRest
+        ? `No heavy lifting today. Focus on light walking, hydration (3.5L), and 7.5h+ sleep.`
+        : `Gym window: 8:10 AM – 9:40 AM. Target RPE: ${dayCalendar.rpe}. Note: ${dayCalendar.notes}`,
+      actionText: isRest ? null : `Start ${dayCalendar.session}`,
+      actionRoutine: dayCalendar.session
+    },
+    {
+      id: `${selectedDate}-act2`,
+      category: 'Nutrition',
+      icon: Utensils,
+      title: `Hit 150g Protein & 2,800 kcal`,
+      desc: `Log meals for ${dayCalendar.dayName}. Post-workout whey shake (10:20 AM), high-protein lunch (1:00 PM), and dinner (8:20 PM).`
+    },
+    {
+      id: `${selectedDate}-act3`,
+      category: 'Apple Watch',
+      icon: Watch,
+      title: `Log Apple Watch Telemetry`,
+      desc: `Track active calories, workout calories, resting HR (${dayCalendar.date}), steps, and sleep.`
+    },
+    {
+      id: `${selectedDate}-act4`,
+      category: 'Supplements',
+      icon: Zap,
+      title: `Daily Supplements`,
+      desc: `5g Creatine Monohydrate, Vitamin B12, Vitamin D3, and Algae Omega-3.`
+    }
   ];
 
-  const tomorrowWorkoutItems = [
-    { id: 'w1', title: 'Gym Time Window: 8:10 AM – 9:40 AM', desc: 'Pre-workout fuel: 1 banana + black coffee at 7:30 AM.' },
-    { id: 'w2', title: 'Push A (Chest, Shoulders, Triceps)', desc: 'Re-acclimation session. RPE 6–7. Leave 3–4 reps in reserve on all sets.' },
-    { id: 'w3', title: 'Log Your Sets Live', desc: 'Open Workout tab, select Push A, enter weight & reps for each set, and tap checkmark.' },
-  ];
+  if (isSunday) {
+    dynamicActionItems.unshift({
+      id: `${selectedDate}-act-sun`,
+      category: 'Weigh-In & Meal Prep',
+      icon: Scale,
+      title: `Fasted Weigh-In & Sunday Batch Cook`,
+      desc: `Weigh yourself Sunday morning immediately after bathroom before eating. Batch cook rice, soy curry, and dal for next week.`
+    });
+  }
 
   const dailyHabits = [
-    { time: '7:30 AM', title: 'Pre-Workout Fuel', detail: '1 large banana + black coffee + 500ml water.' },
-    { time: '8:10 AM', title: 'Gym Training Window', detail: 'Execute workout session. Drink 1L water during workout.' },
-    { time: '10:20 AM', title: 'Post-Workout Breakfast', detail: 'Whey Shake (32g protein) + Poha or Besan Chilla.' },
+    { time: '7:30 AM', title: 'Pre-Workout Fuel', detail: '1 banana + black coffee + 500ml water (7:30 AM).' },
+    { time: '8:10 AM', title: isRest ? 'Active Recovery Walk' : `Gym Training Window (${dayCalendar.session})`, detail: isRest ? '20-min light walk & stretching.' : 'Execute planned workout. Drink 1L water during session.' },
+    { time: '10:20 AM', title: 'Post-Workout Fuel', detail: 'Whey Shake (32g protein) + Poha / Besan Chilla.' },
     { time: '1:00 PM', title: 'High-Protein Lunch', detail: 'Reheated Rice + Soy Chunk Curry / Tofu / Dal (40g protein).' },
-    { time: '5:00 PM', title: 'Afternoon Snack', detail: 'Whey shake or Hummus + Pita (20g protein).' },
-    { time: '8:20 PM', title: 'Dinner', detail: 'Reheated Rice + Paneer / Tofu Stir-Fry (35g protein).' },
-    { time: '11:15 PM', title: 'Bedtime Routine', detail: 'Warm milk + almonds/walnuts. Log remaining meals & supplements.' }
-  ];
-
-  const weeklySchedule = [
-    { day: 'Sunday Morning', title: 'Fasted Weigh-In', detail: 'Weigh yourself immediately after bathroom, before eating or drinking water. Log in Dashboard.' },
-    { day: 'Sunday 6:00 PM', title: 'Batch Prep Session 1', detail: 'Cook Instant Pot Rice (5 servings), Soy Curry, and Moong Dal for Mon–Wed.' },
-    { day: 'Thursday 6:00 PM', title: 'Batch Prep Session 2', detail: 'Cook Pasta, Paneer Bhurji, or Rajma for Thu–Sun.' }
+    { time: '5:00 PM', title: 'Afternoon Fuel', detail: 'Whey shake or Hummus + Whole Wheat Pita (20g protein).' },
+    { time: '8:20 PM', title: 'Dinner', detail: 'Reheated Rice / Pasta + Paneer / Tofu Stir-Fry (35g protein).' },
+    { time: '11:15 PM', title: 'Bedtime & Telemetry', detail: 'Warm milk + almonds. Check off remaining meals & Apple Watch stats.' }
   ];
 
   return (
     <div className="space-y-7 animate-fade-in pb-16">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <span className="pill pill-green text-xs font-bold uppercase tracking-wider">Step-by-Step Guide</span>
+      {/* Header with Dynamic Date Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="pill pill-green text-xs font-bold uppercase tracking-wider">Dynamic Daily Playbook</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">What To Do Next</h1>
+          <p className="text-sm text-slate-500 mt-1 font-medium">Exact step-by-step action plan tailored for {dateLabel}</p>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">What To Do Next</h1>
-        <p className="text-sm text-slate-500 mt-1 font-medium">Your exact daily playbook for a seamless transformation</p>
+
+        <div className="flex items-center gap-2">
+          <label className="text-xs font-bold text-slate-500 flex items-center gap-1.5">
+            <Calendar className="w-4 h-4 text-emerald-600" />
+            <span>Select Date:</span>
+          </label>
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="input-field !w-auto text-xs font-bold"
+          />
+        </div>
       </div>
 
-      {/* Hero Card: Today's Action */}
+      {/* Hero Card: Dynamic Action Plan for Selected Date */}
       <div className="card card-hero-green !p-7">
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3.5">
@@ -55,36 +115,61 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
               <Zap className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-widest font-bold text-emerald-100">Today (Wed 29 July)</p>
-              <h2 className="text-2xl font-extrabold text-white font-display">Setup & Kitchen Prep Day</h2>
+              <p className="text-xs uppercase tracking-widest font-bold text-emerald-100">{dateLabel}</p>
+              <h2 className="text-2xl font-extrabold text-white font-display">
+                {isRest ? 'Rest & Recovery Day' : `${dayCalendar.session} Training Day`}
+              </h2>
             </div>
           </div>
-          <span className="pill bg-white/20 text-white border border-white/30 text-xs font-bold">Setup Only</span>
+          <span className="pill bg-white/20 text-white border border-white/30 text-xs font-bold">
+            Week {dayCalendar.weekNum} &middot; {dayCalendar.dayName}
+          </span>
         </div>
 
-        <p className="text-sm text-emerald-50 leading-relaxed mb-5 font-medium">
-          Today is your zero-stress setup day. Prep your kitchen, check groceries, hydrate (3.5L), get a great night's sleep (7.5h+), and prepare for Day 1 logging starting tomorrow (Thu 30 July)!
+        <p className="text-sm text-emerald-50 leading-relaxed mb-6 font-medium">
+          {isRest
+            ? `Recovery priority. Hydrate with 3.5L water, get 7.5h+ sleep, and prep your meals.`
+            : `Target Workout: ${dayCalendar.session}. RPE: ${dayCalendar.rpe}. Focus on high technical precision and leaving 2-3 reps in reserve.`}
         </p>
 
-        <div className="space-y-2.5">
-          {todayActionItems.map(item => {
+        {/* Action Checkpoints */}
+        <div className="space-y-3">
+          {dynamicActionItems.map((item) => {
             const done = !!completedSteps[item.id];
+            const Icon = item.icon;
+
             return (
               <div
                 key={item.id}
-                onClick={() => toggleStep(item.id)}
-                className={`flex items-center gap-3.5 p-3.5 rounded-2xl cursor-pointer transition-all border ${
+                className={`p-4 rounded-2xl transition-all border ${
                   done
-                    ? 'bg-black/20 border-white/10 text-emerald-100/60 line-through'
+                    ? 'bg-black/20 border-white/10 text-emerald-100/60'
                     : 'bg-white/15 border-white/25 hover:bg-white/20 text-white shadow-sm'
                 }`}
               >
-                <div className={`check-circle ${done ? 'checked' : ''}`} style={done ? { background: '#ffffff', borderColor: '#ffffff' } : { borderColor: 'rgba(255,255,255,0.6)' }}>
-                  {done && <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-white">{item.title}</p>
-                  <p className="text-xs text-emerald-100/90 truncate">{item.desc}</p>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 cursor-pointer flex-1 min-w-0" onClick={() => toggleStep(item.id)}>
+                    <div className={`check-circle ${done ? 'checked' : ''}`} style={done ? { background: '#ffffff', borderColor: '#ffffff' } : { borderColor: 'rgba(255,255,255,0.6)' }}>
+                      {done && <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-md text-emerald-100">{item.category}</span>
+                        <p className={`text-sm font-bold ${done ? 'line-through text-emerald-200/70' : 'text-white'}`}>{item.title}</p>
+                      </div>
+                      <p className="text-xs text-emerald-100/90 mt-1 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+
+                  {item.actionRoutine && !done && (
+                    <button
+                      onClick={() => { setSelectedRoutine(item.actionRoutine); setActiveTab('workout'); }}
+                      className="px-3.5 py-2 rounded-xl bg-white text-emerald-800 text-xs font-bold hover:bg-emerald-50 transition-all shrink-0 flex items-center gap-1 shadow-sm"
+                    >
+                      <span>Start</span> <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -92,50 +177,46 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
         </div>
       </div>
 
-      {/* Step 2: Tomorrow's Workout */}
+      {/* Dynamic Schedule Step */}
       <div className="card !p-7">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
-              <Dumbbell className="w-6 h-6 text-orange-500" />
-            </div>
-            <div>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Step 2 — Tomorrow (Thu 30 July)</p>
-              <h3 className="text-xl font-bold text-slate-900 font-display">First Gym Workout: Push A</h3>
-            </div>
+        <div className="flex items-center gap-3.5 mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+            <Dumbbell className="w-6 h-6 text-orange-500" />
           </div>
-          <button
-            onClick={() => { setSelectedRoutine('Push A'); setActiveTab('workout'); }}
-            className="btn-coral text-xs !py-2.5 !px-4"
-          >
-            <span>Go to Workout</span> <ArrowRight className="w-4 h-4" />
-          </button>
+          <div>
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Scheduled Workout for {selectedDate}</p>
+            <h3 className="text-xl font-bold text-slate-900 font-display">
+              {isRest ? 'Rest & Recovery Day' : dayCalendar.session}
+            </h3>
+          </div>
         </div>
 
-        <div className="space-y-3">
-          {tomorrowWorkoutItems.map((item, idx) => (
-            <div key={item.id} className="flex items-start gap-3.5 p-4 rounded-2xl bg-white/60 border border-slate-200/60 hover:border-orange-500/30 transition-all">
-              <div className="w-7 h-7 rounded-xl bg-orange-500/15 text-orange-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 border border-orange-500/25">
-                {idx + 1}
-              </div>
-              <div>
-                <p className="text-sm font-bold text-slate-800">{item.title}</p>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{item.desc}</p>
-              </div>
-            </div>
-          ))}
+        <div className="p-4 rounded-2xl bg-white/60 border border-slate-200/60 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="pill pill-coral text-xs font-bold">{dayCalendar.rpe}</span>
+            <span className="text-xs font-bold text-slate-400">Week {dayCalendar.weekNum}</span>
+          </div>
+          <p className="text-sm font-bold text-slate-800 pt-1">{dayCalendar.notes}</p>
+          {!isRest && (
+            <button
+              onClick={() => { setSelectedRoutine(dayCalendar.session); setActiveTab('workout'); }}
+              className="btn-coral text-xs !py-2.5 !px-4 mt-3"
+            >
+              <span>Go to {dayCalendar.session} Routine</span> <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Step 3: Daily Habit Blueprint */}
+      {/* Daily Blueprint */}
       <div className="card !p-7">
         <div className="flex items-center gap-3.5 mb-5">
           <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
             <Utensils className="w-6 h-6 text-sky-500" />
           </div>
           <div>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Step 3 — Daily Routine</p>
-            <h3 className="text-xl font-bold text-slate-900 font-display">Your Daily Blueprint</h3>
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Daily Blueprint for {dayCalendar.dayName}</p>
+            <h3 className="text-xl font-bold text-slate-900 font-display">Hour-by-Hour Execution</h3>
           </div>
         </div>
 
@@ -152,30 +233,7 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
         </div>
       </div>
 
-      {/* Step 4: Weekly Protocol */}
-      <div className="card !p-7">
-        <div className="flex items-center gap-3.5 mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-            <Scale className="w-6 h-6 text-purple-500" />
-          </div>
-          <div>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Step 4 — Weekly Routine</p>
-            <h3 className="text-xl font-bold text-slate-900 font-display">Weigh-In & Meal Prep</h3>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {weeklySchedule.map((s, i) => (
-            <div key={i} className="p-4 rounded-2xl bg-white/60 border border-slate-200/60 space-y-1.5 hover:border-purple-500/30 transition-all">
-              <span className="pill pill-purple text-[10px]">{s.day}</span>
-              <p className="text-sm font-bold text-slate-900 pt-1">{s.title}</p>
-              <p className="text-xs text-slate-500 leading-relaxed">{s.detail}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Golden Rules */}
+      {/* Non-Negotiable Rules */}
       <div className="card !p-7 bg-emerald-500/10 border-emerald-500/30">
         <p className="text-base font-bold text-emerald-950 mb-3 flex items-center gap-2 font-display">
           <ShieldCheck className="w-5 h-5 text-emerald-600" />
