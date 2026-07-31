@@ -16,14 +16,14 @@ const SEED_WEEKLY_WEIGHTS = [
   { weekNum: 2, date: '2026-08-09', weightKg: 59.6, waistInches: 29.1, note: '+300g target hit' },
 ];
 
-const SEED_WORKOUT_LOGS = {
-  '2026-07-31': {
-    date: '2026-07-31',
-    routineName: 'Push B',
-    completed: true,
-    exercises: {}
-  }
+export const getLocalDateString = (d = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
+
+const SEED_WORKOUT_LOGS = {};
 
 const SEED_APPLE_WATCH_LOGS = {
   '2026-07-30': {
