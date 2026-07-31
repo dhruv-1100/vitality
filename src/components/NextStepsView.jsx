@@ -56,10 +56,10 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
       id: `${selectedDate}-act4`,
       category: 'Supplements',
       icon: Zap,
-      title: isSunday ? `Daily Creatine 5g + Weekly D3 (60k IU) & B12 Gummy` : `Daily Creatine 5g`,
+      title: isSunday ? `Daily Creatine 5g + 1 B12 Gummy + Weekly D3 (60k IU)` : `Daily Creatine 5g + 1 B12 Gummy`,
       desc: isSunday
-        ? `Take 5g Creatine Monohydrate + 1 Vitamin D3 60,000 IU tablet (with breakfast fat) + 1 B12 Gummy (1500mcg).`
-        : `Take 5g Creatine Monohydrate daily. (B12 1500mcg gummy on Wed/Sun; D3 60k IU tablet on Sun only).`
+        ? `Take 5g Creatine Monohydrate + 1 B12 Gummy + 1 Vitamin D3 60,000 IU tablet (with breakfast fat).`
+        : `Take 5g Creatine Monohydrate + 1 B12 Gummy daily with breakfast/meal. (D3 60k IU tablet on Sunday only).`
     }
   ];
 
