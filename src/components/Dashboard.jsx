@@ -430,10 +430,10 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
             </p>
             <div className="space-y-2.5">
               {[
-                { key: 'creatine', label: 'Creatine 5g', sub: 'Monohydrate — daily', emoji: '💪' },
-                { key: 'b12', label: 'Vitamin B12', sub: '500–1000mcg', emoji: '🔴' },
-                { key: 'd3', label: 'Vitamin D3', sub: '1000–2000 IU', emoji: '☀️' },
-                { key: 'omega3', label: 'Omega-3 (Algae)', sub: 'EPA/DHA', emoji: '🐟' },
+                { key: 'creatine', label: 'Creatine 5g', sub: 'Monohydrate — Daily non-negotiable', emoji: '💪' },
+                { key: 'b12', label: 'Vitamin B12 (1500mcg Gummy)', sub: '1 gummy twice a week (Wed & Sun)', emoji: '🍬' },
+                { key: 'd3', label: 'Vitamin D3 (60,000 IU Tablet)', sub: '1 tablet ONCE a week (Sunday with fat)', emoji: '☀️' },
+                { key: 'healthy_fats', label: 'Whole Food Omega-3 Fats', sub: 'Walnuts, almonds, chia & flax seeds', emoji: '🥜' },
               ].map(s => {
                 const on = !!dailyChecklist[s.key];
                 return (
