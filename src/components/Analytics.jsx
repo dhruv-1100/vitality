@@ -3,7 +3,7 @@ import { TrendingUp, Target, AlertCircle, Scale, Ruler, Flame, Heart, Activity, 
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend, Filler } from 'chart.js';
 import { getWeeklyWeightLogs, getWorkoutLogs, getCompletedCalendarDays, getAppleWatchLogs } from '../utils/storage';
-import { WEIGHT_CHECKPOINTS, PHASES } from '../utils/transformationData';
+import { WEIGHT_CHECKPOINTS, PHASES, AUGUST_CALENDAR } from '../utils/transformationData';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend, Filler);
 
@@ -26,8 +26,15 @@ export default function Analytics() {
   // Waist-to-height ratio (Height = 175 cm = 68.9 inches)
   const whtr = +(latestWaist / 68.9).toFixed(2);
 
-  // Gym Completion Rate
-  const totalCompletedSessions = Object.keys(workoutLogs).filter(k => workoutLogs[k].completed).length + completedCalendar.length;
+  // Gym Completion Rate (Unique workout dates excluding Rest days)
+  const completedWorkoutDates = new Set([
+    ...Object.keys(workoutLogs).filter(k => workoutLogs[k]?.completed),
+    ...completedCalendar.filter(d => {
+      const calItem = AUGUST_CALENDAR.find(c => c.date === d);
+      return calItem ? calItem.session !== 'Rest' : false;
+    })
+  ]);
+  const totalCompletedSessions = completedWorkoutDates.size;
   const adherenceRate = Math.min(100, Math.round((totalCompletedSessions / 5) * 100)); // Target ~5 sessions/week
 
   const gainStatus = avgGain >= 0.15 && avgGain <= 0.35 ? 'on-track' : avgGain < 0.15 ? 'slow' : 'fast';
