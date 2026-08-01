@@ -73,10 +73,17 @@ export const getWorkoutLogs = () => {
     try { logs = JSON.parse(data); } catch (e) { logs = {}; }
   }
 
-  // Auto-migration: Move errant 2026-07-31 workout log to 2026-07-30
-  if (logs['2026-07-31'] && !logs['2026-07-30']) {
+  // Auto-migration 1: Move errant 2026-07-31 workout log to 2026-07-30
+  if (logs['2026-07-31'] && logs['2026-07-31'].routineName === 'Legs A' && !logs['2026-07-30']) {
     logs['2026-07-30'] = { ...logs['2026-07-31'], date: '2026-07-30' };
     delete logs['2026-07-31'];
+    localStorage.setItem(WORKOUT_KEY, JSON.stringify(logs));
+  }
+
+  // Auto-migration 2: Move errant 2026-08-01 Push workout log to 2026-07-31
+  if (logs['2026-08-01'] && !logs['2026-07-31']) {
+    logs['2026-07-31'] = { ...logs['2026-08-01'], date: '2026-07-31', routineName: 'Push B' };
+    delete logs['2026-08-01'];
     localStorage.setItem(WORKOUT_KEY, JSON.stringify(logs));
   }
 
@@ -135,16 +142,28 @@ export const saveAppleWatchLog = (date, watchData) => {
 
 export const getCompletedCalendarDays = () => {
   const data = localStorage.getItem(CALENDAR_KEY);
-  if (!data) {
-    const seedCompleted = [];
-    localStorage.setItem(CALENDAR_KEY, JSON.stringify(seedCompleted));
-    return seedCompleted;
+  let days = [];
+  if (data) {
+    try { days = JSON.parse(data); } catch (e) { days = []; }
   }
-  try {
-    return JSON.parse(data);
-  } catch (e) {
-    return [];
+
+  // Migration: Ensure 2026-07-30 and 2026-07-31 are completed if workout logs exist, and clean up errant 2026-08-01 completion
+  const MIGRATION_KEY = 'transformation_aug01_migration_v3';
+  if (!localStorage.getItem(MIGRATION_KEY)) {
+    if (days.includes('2026-08-01')) {
+      days = days.filter(d => d !== '2026-08-01');
+    }
+    if (!days.includes('2026-07-31')) {
+      days.push('2026-07-31');
+    }
+    if (!days.includes('2026-07-30')) {
+      days.push('2026-07-30');
+    }
+    localStorage.setItem(CALENDAR_KEY, JSON.stringify(days));
+    localStorage.setItem(MIGRATION_KEY, 'done');
   }
+
+  return days;
 };
 
 export const toggleCalendarDayCompleted = (date) => {
