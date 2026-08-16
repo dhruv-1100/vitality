@@ -63,7 +63,7 @@ export default function DietHub() {
           <div className="card !p-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                   <CalendarDays className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
@@ -95,10 +95,10 @@ export default function DietHub() {
                   <button
                     key={w.day}
                     onClick={() => setSelectedDayName(w.day)}
-                    className={`flex-1 min-w-[52px] py-2.5 px-3 rounded-2xl text-xs font-extrabold transition-all border ${
+                    className={`flex-1 min-w-[52px] py-2.5 px-3 rounded-xl text-xs font-extrabold transition-all border ${
                       active
-                        ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/15 scale-[1.03]'
-                        : 'bg-white/60 text-slate-500 border-slate-200/60 hover:bg-slate-100 hover:text-slate-900'
+                        ? 'bg-slate-900 text-slate-50 border-slate-900'
+                        : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
                     }`}
                   >
                     {w.day}
@@ -111,8 +111,8 @@ export default function DietHub() {
           {/* Timetable List */}
           <div className="card !p-0 overflow-hidden">
             {timetable.map((meal, idx) => (
-              <div key={idx} className={`flex items-center gap-4 p-4 ${idx > 0 ? 'border-t border-slate-100' : ''}`}>
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+              <div key={idx} className={`flex items-center gap-4 p-4 ${idx > 0 ? 'border-t border-slate-200' : ''}`}>
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
                   <Clock className="w-4 h-4 text-emerald-600" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -130,7 +130,7 @@ export default function DietHub() {
             ))}
 
             {/* Plan totals — makes it obvious whether the day's plan reaches the targets */}
-            <div className="flex items-center gap-4 p-4 border-t border-slate-200/60 bg-slate-50/60">
+            <div className="flex items-center gap-4 p-4 border-t border-slate-200 bg-slate-50">
               <div className="w-10 shrink-0" />
               <p className="flex-1 text-xs font-extrabold text-slate-500 uppercase tracking-wider">Plan Total</p>
               <div className="text-right shrink-0">
@@ -150,7 +150,7 @@ export default function DietHub() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {PRE_WORKOUT_CARBS.map((opt, i) => (
-                <div key={i} className="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                <div key={i} className="flex items-center gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
                   <span className="text-base">⚡</span>
                   <span className="text-xs font-semibold text-amber-900">{opt}</span>
                 </div>
@@ -171,7 +171,7 @@ export default function DietHub() {
           {BATCH_COOKING_SESSIONS.map(session => (
             <div key={session.id} className="card !p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
                   <ChefHat className="w-5 h-5 text-orange-500" />
                 </div>
                 <div>
@@ -184,7 +184,7 @@ export default function DietHub() {
                 {session.recipes.map((recipe, ri) => {
                   const isOpen = expandedRecipe === `${session.id}-${ri}`;
                   return (
-                    <div key={ri} className="border border-slate-200/60 rounded-2xl overflow-hidden bg-white/60">
+                    <div key={ri} className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
                       <button
                         onClick={() => setExpandedRecipe(isOpen ? null : `${session.id}-${ri}`)}
                         className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 transition-colors"
@@ -197,7 +197,7 @@ export default function DietHub() {
                       </button>
                       {isOpen && (
                         <div className="px-4 pb-4 pt-0">
-                          <p className="text-xs text-slate-600 bg-slate-50 p-3.5 rounded-xl leading-relaxed border border-slate-100">{recipe.ingredients}</p>
+                          <p className="text-xs text-slate-600 bg-slate-50 p-3.5 rounded-xl leading-relaxed border border-slate-200">{recipe.ingredients}</p>
                         </div>
                       )}
                     </div>
@@ -230,11 +230,11 @@ export default function DietHub() {
             <div key={r.weekLabel} className="card !p-6 space-y-4">
               <div>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sunday Prep (Mon–Wed)</p>
-                <p className="text-sm font-medium text-emerald-900 bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20">{r.session1}</p>
+                <p className="text-sm font-medium text-emerald-900 bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20">{r.session1}</p>
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Thursday Prep (Thu–Sun)</p>
-                <p className="text-sm font-medium text-orange-900 bg-orange-500/10 p-4 rounded-2xl border border-orange-500/20">{r.session2}</p>
+                <p className="text-sm font-medium text-orange-900 bg-orange-500/10 p-4 rounded-xl border border-orange-500/20">{r.session2}</p>
               </div>
             </div>
           ))}
@@ -252,7 +252,7 @@ export default function DietHub() {
             <p className="text-xs text-slate-400 mb-4">When life gets busy. Zero prep, high protein options.</p>
             <div className="space-y-2.5">
               {EMERGENCY_MEALS.map((meal, i) => (
-                <div key={i} className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                <div key={i} className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
                   <p className="text-sm font-bold text-amber-950">{meal.title}</p>
                   <p className="text-xs text-amber-800 mt-0.5">{meal.desc}</p>
                 </div>

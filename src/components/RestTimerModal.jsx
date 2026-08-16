@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Play, Pause, RotateCcw, Plus } from 'lucide-react';
+import { X, Play, Pause, RotateCcw } from 'lucide-react';
+import { COLORS } from '../utils/theme';
 
 // Turns the routine's human-readable rest ("90 sec", "2-3 min", "3 min") into
 // seconds. Range values resolve to the lower bound so the timer never overshoots.
@@ -94,11 +95,11 @@ export default function RestTimerModal({ seconds = 120, onClose }) {
   const offset = c - (Math.min(100, pct) / 100) * c;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/25 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
       <div className="card max-w-xs w-full !p-8 text-center animate-scale-in" style={{ boxShadow: 'var(--shadow-modal)' }}>
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-base font-bold text-slate-900 font-display">Rest Timer</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-black/5 text-slate-400" title="Close">
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400" title="Close">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -106,10 +107,10 @@ export default function RestTimerModal({ seconds = 120, onClose }) {
         {/* Ring */}
         <div className="relative w-32 h-32 mx-auto mb-6">
           <svg width="128" height="128" className="-rotate-90">
-            <circle cx="64" cy="64" r={r} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="10" />
+            <circle cx="64" cy="64" r={r} fill="none" stroke={COLORS.hairline} strokeWidth="10" />
             <circle
               cx="64" cy="64" r={r} fill="none"
-              stroke={done ? '#22c55e' : '#38bdf8'}
+              stroke={done ? COLORS.clay : COLORS.dusk}
               strokeWidth="10" strokeLinecap="round"
               strokeDasharray={c} strokeDashoffset={offset}
               className="transition-all duration-1000 ease-linear"
@@ -129,7 +130,7 @@ export default function RestTimerModal({ seconds = 120, onClose }) {
             onClick={() => (done ? restart() : setRunning(!running))}
             disabled={done}
             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer disabled:opacity-40 disabled:cursor-default ${
-              running ? 'bg-black/5 text-slate-600 hover:bg-black/10' : 'bg-sky-500/10 text-sky-600 hover:bg-sky-500/20'
+              running ? 'bg-slate-100 text-slate-600 hover:bg-slate-200' : 'bg-sky-500/10 text-sky-600 hover:bg-sky-500/20'
             }`}
             title={running ? 'Pause' : 'Resume'}
           >
@@ -137,14 +138,14 @@ export default function RestTimerModal({ seconds = 120, onClose }) {
           </button>
           <button
             onClick={() => restart()}
-            className="w-12 h-12 rounded-full bg-black/5 text-slate-600 hover:bg-black/10 flex items-center justify-center transition-all cursor-pointer"
+            className="w-12 h-12 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-all cursor-pointer"
             title="Restart"
           >
             <RotateCcw className="w-5 h-5" />
           </button>
           <button
             onClick={() => addTime(30)}
-            className="w-12 h-12 rounded-full bg-black/5 text-slate-600 hover:bg-black/10 flex items-center justify-center transition-all cursor-pointer text-xs font-extrabold"
+            className="w-12 h-12 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-all cursor-pointer text-xs font-extrabold"
             title="Add 30 seconds"
           >
             +30s

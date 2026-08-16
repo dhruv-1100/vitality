@@ -7,7 +7,7 @@ const SESSION_STYLES = {
   Push: 'bg-rose-500/10 text-rose-700 border-rose-500/20',
   Pull: 'bg-sky-500/10 text-sky-700 border-sky-500/20',
   Legs: 'bg-purple-500/10 text-purple-700 border-purple-500/20',
-  Rest: 'bg-black/5 text-slate-500 border-black/10',
+  Rest: 'bg-slate-100 text-slate-500 border-slate-200',
 };
 
 const getSessionStyle = (session) => {
@@ -59,7 +59,7 @@ export default function WorkoutCalendar({ setActiveTab, setSelectedRoutine }) {
           return (
             <div
               key={day.date}
-              className={`flex items-center gap-4 p-4 transition-colors ${idx > 0 ? 'border-t border-slate-200/50' : ''} ${
+              className={`flex items-center gap-4 p-4 transition-colors ${idx > 0 ? 'border-t border-slate-200' : ''} ${
                 isDone ? 'bg-emerald-500/10' : isToday ? 'bg-sky-500/5' : ''
               }`}
             >
@@ -99,14 +99,14 @@ export default function WorkoutCalendar({ setActiveTab, setSelectedRoutine }) {
               {/* RPE + Launch */}
               <div className="flex items-center gap-2 shrink-0">
                 {day.rpe !== '-' && (
-                  <span className="hidden sm:inline text-[11px] font-bold text-slate-500 bg-black/5 px-2.5 py-1 rounded-lg">
+                  <span className="hidden sm:inline text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
                     {day.rpe}
                   </span>
                 )}
                 {!isRest && (
                   <button
                     onClick={() => { setSelectedRoutine(day.session); setActiveTab('workout'); }}
-                    className="w-9 h-9 rounded-xl bg-black/5 hover:bg-orange-500/15 hover:text-orange-600 text-slate-400 flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-orange-500/15 hover:text-orange-600 text-slate-400 flex items-center justify-center transition-colors cursor-pointer"
                     title={`Open ${day.session}`}
                   >
                     <ChevronRight className="w-4 h-4" />

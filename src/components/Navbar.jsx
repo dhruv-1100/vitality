@@ -42,11 +42,10 @@ export default function Navbar({ activeTab, setActiveTab }) {
     <>
       <header
         style={{
-          background: 'rgba(255, 255, 255, 0.72)',
-          backdropFilter: 'blur(25px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(25px) saturate(180%)',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
-          boxShadow: '0 4px 20px -4px rgba(0, 0, 0, 0.03)'
+          background: 'rgba(245, 244, 238, 0.85)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid var(--border-hair)'
         }}
         className="sticky top-0 z-40"
       >
@@ -57,7 +56,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
               <img
                 src="./vitality_logo.jpg"
                 alt="Vitality Logo"
-                className="w-10 h-10 rounded-2xl object-cover shadow-md transition-transform duration-300 group-hover:scale-105 border border-emerald-500/30"
+                className="w-10 h-10 rounded-xl object-cover shadow-md transition-transform duration-300 group-hover:scale-105 border border-emerald-500/30"
               />
               <div className="text-left">
                 <h1 className="text-base font-extrabold text-slate-900 leading-none tracking-tight font-display group-hover:text-green-600 transition-colors">Vitality</h1>
@@ -66,7 +65,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
             </button>
 
             {/* Desktop Segmented Control Tabs */}
-            <nav className="hidden lg:flex items-center gap-1 bg-black/5 p-1.5 rounded-full border border-black/5">
+            <nav className="hidden lg:flex items-center gap-0.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
               {tabs.map(tab => {
                 const Icon = tab.icon;
                 const active = activeTab === tab.id;
@@ -74,13 +73,13 @@ export default function Navbar({ activeTab, setActiveTab }) {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 ${
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors duration-150 ${
                       active
-                        ? 'bg-slate-900 text-white shadow-md shadow-slate-900/20'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-black/5'
+                        ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
+                        : 'text-slate-500 hover:text-slate-900'
                     }`}
                   >
-                    <Icon className="w-4 h-4" strokeWidth={active ? 2.5 : 2} />
+                    <Icon className="w-4 h-4" strokeWidth={active ? 2.25 : 1.9} />
                     <span>{tab.label}</span>
                   </button>
                 );
@@ -90,7 +89,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
             {/* Backup */}
             <button
               onClick={() => setShowBackup(true)}
-              className="w-10 h-10 rounded-2xl flex items-center justify-center bg-black/5 text-slate-500 hover:text-slate-900 hover:bg-black/10 transition-all border border-black/5"
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-all border border-slate-200"
               title="Backup & Restore"
             >
               <Database className="w-4 h-4" />
@@ -106,9 +105,9 @@ export default function Navbar({ activeTab, setActiveTab }) {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                     active
-                      ? 'bg-slate-900 text-white'
+                      ? 'bg-slate-900 text-slate-50'
                       : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
@@ -123,11 +122,11 @@ export default function Navbar({ activeTab, setActiveTab }) {
 
       {/* Backup Modal */}
       {showBackup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/30 backdrop-blur-md animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
           <div className="card max-w-md w-full !p-6 animate-scale-in" style={{ boxShadow: '0 20px 50px rgba(0,0,0,0.15)' }}>
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                   <Database className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
@@ -135,7 +134,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
                   <p className="text-xs text-slate-400">Data lives in your browser's local storage</p>
                 </div>
               </div>
-              <button onClick={() => setShowBackup(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-black/5 text-slate-400">
+              <button onClick={() => setShowBackup(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-400">
                 <X className="w-4 h-4" />
               </button>
             </div>

@@ -48,7 +48,7 @@ export default function AppleWatchModal({ activeDate, onClose, onSaved }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/25 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
       <div className="card max-w-lg w-full p-6 animate-scale-in" style={{ boxShadow: 'var(--shadow-modal)' }}>
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">

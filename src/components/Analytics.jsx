@@ -3,6 +3,7 @@ import { TrendingUp, Target, AlertCircle, Scale, Ruler, Flame, Dumbbell, Zap, Wa
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend, Filler } from 'chart.js';
 import { getWeeklyWeightLogs, getWorkoutLogs, getCompletedCalendarDays, getAppleWatchLogs, getLocalDateString, parseLocalDate } from '../utils/storage';
+import { COLORS } from '../utils/theme';
 import { WEIGHT_CHECKPOINTS, AUGUST_CALENDAR } from '../utils/transformationData';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend, Filler);
@@ -54,11 +55,11 @@ export default function Analytics() {
       {
         label: 'Weight (kg)',
         data: weights,
-        borderColor: '#22c55e',
-        backgroundColor: 'rgba(34, 197, 94, 0.12)',
+        borderColor: COLORS.clay,
+        backgroundColor: COLORS.clayWash,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#22c55e',
+        pointBackgroundColor: COLORS.clay,
         pointRadius: 6,
         pointHoverRadius: 8,
         borderWidth: 3,
@@ -73,11 +74,11 @@ export default function Analytics() {
       {
         label: 'Waist (inches)',
         data: waists,
-        borderColor: '#38bdf8',
-        backgroundColor: 'rgba(56, 189, 248, 0.12)',
+        borderColor: COLORS.dusk,
+        backgroundColor: COLORS.duskWash,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#38bdf8',
+        pointBackgroundColor: COLORS.dusk,
         pointRadius: 6,
         pointHoverRadius: 8,
         borderWidth: 3,
@@ -96,14 +97,14 @@ export default function Analytics() {
         label: 'Active Cals (kcal)',
         // null leaves a gap in the bar chart rather than inventing a number.
         data: watchDates.map(d => watchLogs[d]?.activeCalories ?? watchLogs[d]?.dailyActiveCalories ?? null),
-        backgroundColor: '#22c55e',
-        borderRadius: 8,
+        backgroundColor: COLORS.clay,
+        borderRadius: 6,
       },
       {
         label: 'Workout Burn (kcal)',
         data: watchDates.map(d => watchLogs[d]?.workoutCalories ?? null),
-        backgroundColor: '#f97316',
-        borderRadius: 8,
+        backgroundColor: COLORS.dusk,
+        borderRadius: 6,
       }
     ]
   };
@@ -114,7 +115,7 @@ export default function Analytics() {
     datasets: [
       {
         data: [600, 1400, 765], // 600 kcal from P, 1400 from C, 765 from F = ~2765 kcal
-        backgroundColor: ['#fb923c', '#38bdf8', '#34d399'],
+        backgroundColor: [COLORS.clay, COLORS.dusk, COLORS.ochre],
         borderWidth: 0,
       }
     ]
@@ -126,7 +127,7 @@ export default function Analytics() {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#0f172a',
+        backgroundColor: COLORS.ink,
         titleFont: { family: 'Inter', size: 12, weight: 'bold' },
         bodyFont: { family: 'Inter', size: 12 },
         padding: 12,
@@ -138,8 +139,8 @@ export default function Analytics() {
       },
     },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#64748b' } },
-      y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#64748b' } },
+      x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: COLORS.stone } },
+      y: { grid: { color: COLORS.hairline }, ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: COLORS.stone } },
     },
   });
 
@@ -219,7 +220,7 @@ export default function Analytics() {
         'border-l-rose-500 bg-rose-500/10'
       }`}>
         <div className="flex items-center gap-3.5">
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
             gainStatus === 'on-track' ? 'bg-emerald-500/20 text-emerald-600' :
             gainStatus === 'slow' ? 'bg-amber-500/20 text-amber-600' : 'bg-rose-500/20 text-rose-600'
           }`}>
@@ -244,7 +245,7 @@ export default function Analytics() {
         <div className="card !p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                 <Scale className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
@@ -263,7 +264,7 @@ export default function Analytics() {
         <div className="card !p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
                 <Ruler className="w-5 h-5 text-sky-500" />
               </div>
               <div>
@@ -285,7 +286,7 @@ export default function Analytics() {
         <div className="card !p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
                 <Flame className="w-5 h-5 text-orange-500" />
               </div>
               <div>
@@ -304,7 +305,7 @@ export default function Analytics() {
                   plugins: { legend: { display: true, position: 'top', labels: { font: { family: 'Inter', size: 11, weight: '600' } } } },
                   scales: {
                     x: { grid: { display: false } },
-                    y: { grid: { color: 'rgba(0,0,0,0.04)' } }
+                    y: { grid: { color: COLORS.hairline } }
                   }
                 }}
               />
@@ -364,7 +365,7 @@ export default function Analytics() {
           {WEIGHT_CHECKPOINTS.map((cp, i) => {
             const hit = latestWeight >= cp.targetKg;
             return (
-              <div key={i} className={`p-4 rounded-2xl border transition-all ${hit ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white/60 border-slate-200/60'}`}>
+              <div key={i} className={`p-4 rounded-xl border transition-all ${hit ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-slate-50 border-slate-200'}`}>
                 <div className="flex items-center justify-between mb-2">
                   <span className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold ${hit ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'}`}>
                     {hit ? '✓' : i + 1}

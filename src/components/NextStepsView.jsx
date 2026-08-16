@@ -39,7 +39,8 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
         ? `No heavy lifting today. Focus on light walking, hydration (3.5L), and 7.5h+ sleep.`
         : `Gym window: 8:10 AM – 9:40 AM. Target RPE: ${dayCalendar.rpe}. Note: ${dayCalendar.notes}`,
       actionText: isRest ? null : `Start ${dayCalendar.session}`,
-      actionRoutine: dayCalendar.session
+      // "Rest" is not a routine — offering Start would land on a "not found" screen.
+      actionRoutine: isRest ? null : dayCalendar.session
     },
     {
       id: `${selectedDate}-act2`,
@@ -121,7 +122,7 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
       <div className="card card-hero-green !p-7">
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/30 backdrop-blur-md flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-white/20 border border-white/30 backdrop-blur-md flex items-center justify-center">
               <Zap className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -151,9 +152,9 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
             return (
               <div
                 key={item.id}
-                className={`p-4 rounded-2xl transition-all border ${
+                className={`p-4 rounded-xl transition-all border ${
                   done
-                    ? 'bg-black/20 border-white/10 text-emerald-100/60'
+                    ? 'bg-slate-900/20 border-white/10 text-emerald-100/60'
                     : 'bg-white/15 border-white/25 hover:bg-white/20 text-white shadow-sm'
                 }`}
               >
@@ -190,7 +191,7 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
       {/* Dynamic Schedule Step */}
       <div className="card !p-7">
         <div className="flex items-center gap-3.5 mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
             <Dumbbell className="w-6 h-6 text-orange-500" />
           </div>
           <div>
@@ -201,9 +202,13 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white/60 border border-slate-200/60 space-y-2">
+        <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="pill pill-coral text-xs font-bold">{dayCalendar.rpe}</span>
+            {dayCalendar.rpe && dayCalendar.rpe !== '-' ? (
+              <span className="pill pill-coral text-xs font-bold">{dayCalendar.rpe}</span>
+            ) : (
+              <span className="pill pill-gray text-xs font-bold">Recovery</span>
+            )}
             <span className="text-xs font-bold text-slate-400">Week {dayCalendar.weekNum}</span>
           </div>
           <p className="text-sm font-bold text-slate-800 pt-1">{dayCalendar.notes}</p>
@@ -221,7 +226,7 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
       {/* Daily Blueprint */}
       <div className="card !p-7">
         <div className="flex items-center gap-3.5 mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
             <Utensils className="w-6 h-6 text-sky-500" />
           </div>
           <div>
@@ -232,7 +237,7 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
 
         <div className="space-y-2">
           {dailyHabits.map((h, i) => (
-            <div key={i} className="flex items-center gap-4 p-3.5 rounded-xl bg-white/50 border border-slate-200/50 hover:border-sky-500/30 hover:bg-white/80 transition-all">
+            <div key={i} className="flex items-center gap-4 p-3.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-sky-500/30 hover:bg-white transition-all">
               <span className="text-xs font-bold text-sky-600 w-16 shrink-0 tracking-wide">{h.time}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-slate-800">{h.title}</p>

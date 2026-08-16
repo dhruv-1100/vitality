@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Scale, Dumbbell, Utensils, Droplets, Pill, Flame, ArrowRight, Heart, Footprints, Moon, Watch, Plus, Info, Activity, Sparkles, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 import { AUGUST_CALENDAR, MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLES_MAP, WEEKDAYS, getAlternativesForSlot } from '../utils/transformationData';
 import { getWeeklyWeightLogs, saveWeeklyWeightLog, getMealChecks, saveMealCheck, getDailyChecklist, saveDailyChecklist, getAppleWatchLogForDate, getSlotSwaps, saveSlotSwap, getLocalDateString, parseLocalDate, getDayName, isSunday } from '../utils/storage';
+import { COLORS } from '../utils/theme';
 import AppleWatchModal from './AppleWatchModal';
 import MealSlotEditor from './MealSlotEditor';
 
@@ -123,7 +124,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
   // Metrics can be absent on a partially filled entry — show a dash, never a zero.
   const fmt = (value) => (typeof value === 'number' ? value.toLocaleString() : '—');
 
-  const Ring = ({ pct, color, trackColor = 'rgba(0,0,0,0.06)', size = 100, stroke = 12, children }) => {
+  const Ring = ({ pct, color, trackColor = '#e6e3d8', size = 100, stroke = 12, children }) => {
     const r = (size - stroke) / 2;
     const c = 2 * Math.PI * r;
     const offset = c - (Math.min(100, pct) / 100) * c;
@@ -179,7 +180,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
       {/* Apple Watch Biometrics Strip */}
       <div className="card !p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
             <Watch className="w-5 h-5 text-sky-500" />
           </div>
           <div>
@@ -200,7 +201,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
             <span className="pill pill-pink" title="Workout Average Heart Rate"><Heart className="w-3.5 h-3.5" />Wk Avg HR: {fmt(watchData.workoutAvgHeartRate)} bpm</span>
             <span className="pill pill-blue" title="Daily Steps"><Footprints className="w-3.5 h-3.5" />{fmt(watchData.stepCount)} steps</span>
             <span className="pill pill-purple" title="Sleep Duration"><Moon className="w-3.5 h-3.5" />{fmt(watchData.sleepHours)}h sleep</span>
-            <button onClick={() => setShowWatchModal(true)} className="pill pill-gray hover:bg-black/10 cursor-pointer transition-colors">
+            <button onClick={() => setShowWatchModal(true)} className="pill pill-gray hover:bg-slate-200 cursor-pointer transition-colors">
               <Plus className="w-3.5 h-3.5" />Edit Stats
             </button>
           </div>
@@ -215,7 +216,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 animate-fade-in">
         {/* Calories Ring */}
         <div className="card flex items-center gap-6 !p-6">
-          <Ring pct={calPct} color="#22c55e" size={100} stroke={12}>
+          <Ring pct={calPct} color={COLORS.clay} size={100} stroke={10}>
             <span className="text-xl font-extrabold text-slate-900 tabular-nums">{checkedCals}</span>
             <span className="text-[10px] text-slate-400 font-semibold -mt-0.5">/ 2800</span>
           </Ring>
@@ -228,7 +229,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
 
         {/* Protein Ring */}
         <div className="card flex items-center gap-6 !p-6">
-          <Ring pct={protPct} color="#fb923c" size={100} stroke={12}>
+          <Ring pct={protPct} color={COLORS.ochre} size={100} stroke={10}>
             <span className="text-xl font-extrabold text-slate-900 tabular-nums">{checkedProtein}g</span>
             <span className="text-[10px] text-slate-400 font-semibold -mt-0.5">/ 150g</span>
           </Ring>
@@ -243,7 +244,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
         <div className="card !p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3.5 mb-3">
-              <div className="w-11 h-11 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+              <div className="w-11 h-11 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
                 <Dumbbell className="w-5 h-5 text-orange-500" />
               </div>
               <div>
@@ -272,7 +273,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
         <div className="card !p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                 <Scale className="w-5 h-5 text-emerald-600" />
               </div>
               <p className="text-base font-bold text-slate-900 font-display">Weight</p>
@@ -288,13 +289,12 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
           </div>
           <p className="text-sm text-slate-500 mb-5">Target: <span className="font-bold text-emerald-600">66.0 kg</span> by December</p>
 
-          <div className="w-full bg-black/5 rounded-full h-3 overflow-hidden border border-black/5">
+          <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
                 width: `${Math.max(3, weightPct)}%`,
-                background: 'linear-gradient(90deg, #4ade80, #22c55e)',
-                boxShadow: '0 0 12px rgba(34, 197, 94, 0.4)'
+                background: COLORS.clay
               }}
             />
           </div>
@@ -347,7 +347,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
           ) : (
             <div className="flex flex-col justify-center h-full space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
                   <Scale className="w-5 h-5 text-purple-600" />
                 </div>
                 <div>
@@ -355,7 +355,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
                   <p className="text-xs text-slate-400">Weekly weigh-in box unlocks every Sunday morning</p>
                 </div>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/50">
+              <p className="text-xs text-slate-500 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                 💡 To prevent daily fluid fluctuation anxiety, official weigh-in logging opens strictly on <strong>Sunday mornings</strong> immediately after waking up and using the bathroom (before eating/drinking).
               </p>
             </div>
@@ -370,7 +370,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                 <Utensils className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
@@ -389,10 +389,10 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
                 <button
                   key={w.day}
                   onClick={() => selectWeekday(w.day)}
-                  className={`flex-1 min-w-[48px] py-2 px-3 rounded-2xl text-xs font-extrabold transition-all border ${
+                  className={`flex-1 min-w-[48px] py-2 px-3 rounded-xl text-xs font-extrabold transition-all border ${
                     active
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/15 scale-[1.03]'
-                      : 'bg-white/60 text-slate-500 border-slate-200/60 hover:bg-slate-100 hover:text-slate-900'
+                      ? 'bg-slate-900 text-slate-50 border-slate-900'
+                      : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
                   {w.day}
@@ -415,10 +415,10 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
               return (
                 <div
                   key={idx}
-                  className={`rounded-2xl border transition-all overflow-hidden ${
+                  className={`rounded-xl border transition-all overflow-hidden ${
                     checked
                       ? 'bg-emerald-500/10 border-emerald-500/25 text-slate-700'
-                      : 'bg-white/60 border-slate-200/60 hover:border-slate-300 text-slate-900'
+                      : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900'
                   }`}
                 >
                   {/* Slot Main Row */}
@@ -448,7 +448,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
                       {alternatives && (
                         <button
                           onClick={(e) => { e.stopPropagation(); setOpenSwapIdx(isSwapOpen ? null : idx); }}
-                          className="p-1.5 rounded-xl bg-black/5 hover:bg-black/10 text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1 text-xs font-semibold cursor-pointer"
+                          className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1 text-xs font-semibold cursor-pointer"
                           title="Swap meal choice for this slot"
                         >
                           <RefreshCw className="w-3.5 h-3.5" />
@@ -496,10 +496,10 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
                   <button
                     key={s.key}
                     onClick={() => toggleSupp(s.key)}
-                    className={`w-full flex items-center gap-3.5 p-3.5 rounded-2xl text-left transition-all border ${
+                    className={`w-full flex items-center gap-3.5 p-3.5 rounded-xl text-left transition-all border ${
                       on
                         ? 'bg-sky-500/10 border-sky-500/25'
-                        : 'bg-white/60 border-slate-200/60 hover:border-slate-300'
+                        : 'bg-slate-50 border-slate-200 hover:border-slate-300'
                     }`}
                   >
                     <span className="text-lg">{s.emoji}</span>
@@ -507,7 +507,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
                       <p className={`text-sm font-bold ${on ? 'text-sky-800' : 'text-slate-900'}`}>{s.label}</p>
                       <p className="text-[11px] text-slate-400">{s.sub}</p>
                     </div>
-                    <div className={`check-circle ${on ? 'checked' : ''}`} style={on ? { background: '#38bdf8', borderColor: '#38bdf8', boxShadow: '0 0 10px rgba(56,189,248,0.4)' } : {}}>
+                    <div className={`check-circle ${on ? 'checked' : ''}`} >
                       {on && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                     </div>
                   </button>
@@ -535,13 +535,12 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
                 <button onClick={() => addWater(0.5)} className="!text-xs !px-3.5 !py-2 rounded-xl bg-sky-500/15 text-sky-700 font-bold border border-sky-500/25 hover:bg-sky-500/25 transition-all cursor-pointer">+0.5L</button>
               </div>
             </div>
-            <div className="w-full bg-black/5 rounded-full h-3 overflow-hidden border border-black/5">
+            <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
                   width: `${Math.min(100, ((dailyChecklist.waterLitres || 0) / 3.5) * 100)}%`,
-                  background: 'linear-gradient(90deg, #38bdf8, #0284c7)',
-                  boxShadow: '0 0 12px rgba(56, 189, 248, 0.4)'
+                  background: COLORS.dusk
                 }}
               />
             </div>

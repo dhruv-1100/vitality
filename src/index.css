@@ -1,316 +1,464 @@
 @import "tailwindcss";
 
-/* Inter + Outfit are loaded via the <link> in index.html — importing them here
-   too fired a second, render-blocking request for the same families. */
+/* Inter + Source Serif 4 are loaded via the <link> in index.html. */
+
+/* ============================================================
+   CLAUDE DESIGN LANGUAGE
+   Warm paper canvas, clay accent, editorial serif display,
+   flat surfaces separated by hairline warm borders.
+
+   The Tailwind palette scales below are deliberately remapped
+   onto warm equivalents: the app addresses colour through
+   utilities like `text-emerald-600` in ~250 places, so
+   retuning the ramps keeps every surface on-palette without
+   rewriting each class. Names are kept as roles:
+     emerald/green -> clay   (primary brand)
+     orange/amber  -> ochre  (training + warning)
+     sky/blue      -> dusk   (hydration + info)
+     purple        -> plum   (secondary data)
+     rose/pink/red -> brick  (alerts + heart rate)
+     slate/gray    -> stone  (warm neutrals)
+   ============================================================ */
 
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
-  --color-primary: #10b981;
-  --color-primary-dark: #059669;
-  --color-coral: #f97316;
-  --color-coral-dark: #ea580c;
-  --color-sky: #38bdf8;
-  --color-sky-dark: #0284c7;
+  --font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+
+  /* --- Stone: warm neutrals --- */
+  --color-slate-50:  #faf9f5;
+  --color-slate-100: #f2f0e9;
+  --color-slate-200: #e6e3d8;
+  --color-slate-300: #d2cec1;
+  --color-slate-400: #736f67;
+  --color-slate-500: #5e5b54;
+  --color-slate-600: #4a4842;
+  --color-slate-700: #403e38;
+  --color-slate-800: #2a2926;
+  --color-slate-900: #141413;
+  --color-slate-950: #0c0c0b;
+
+  --color-gray-50:  #faf9f5;
+  --color-gray-100: #f2f0e9;
+  --color-gray-200: #e6e3d8;
+  --color-gray-300: #d2cec1;
+  --color-gray-400: #736f67;
+  --color-gray-500: #5e5b54;
+  --color-gray-600: #4a4842;
+  --color-gray-700: #403e38;
+  --color-gray-800: #2a2926;
+  --color-gray-900: #141413;
+
+  /* --- Clay: the Claude accent (primary) --- */
+  --color-emerald-50:  #fbf4f1;
+  --color-emerald-100: #f6e7e0;
+  --color-emerald-200: #eecfc2;
+  --color-emerald-300: #e2ae9b;
+  --color-emerald-400: #d78f75;
+  --color-emerald-500: #d97757;
+  --color-emerald-600: #b05434;
+  --color-emerald-700: #9d4b31;
+  --color-emerald-800: #7a3a26;
+  --color-emerald-900: #5a2b1d;
+  --color-emerald-950: #3b1c13;
+
+  --color-green-50:  #fbf4f1;
+  --color-green-100: #f6e7e0;
+  --color-green-200: #eecfc2;
+  --color-green-300: #e2ae9b;
+  --color-green-400: #d78f75;
+  --color-green-500: #d97757;
+  --color-green-600: #b05434;
+  --color-green-700: #9d4b31;
+  --color-green-800: #7a3a26;
+  --color-green-900: #5a2b1d;
+
+  /* --- Ochre: training + warning --- */
+  --color-orange-50:  #fbf6ec;
+  --color-orange-100: #f5ead2;
+  --color-orange-200: #e9d3a6;
+  --color-orange-300: #d9b673;
+  --color-orange-400: #c79a4f;
+  --color-orange-500: #b3813a;
+  --color-orange-600: #96692c;
+  --color-orange-700: #775224;
+  --color-orange-800: #5c3f1e;
+  --color-orange-900: #452f18;
+  --color-orange-950: #2c1e10;
+
+  --color-amber-50:  #fbf6ec;
+  --color-amber-100: #f5ead2;
+  --color-amber-200: #e9d3a6;
+  --color-amber-300: #d9b673;
+  --color-amber-400: #c79a4f;
+  --color-amber-500: #b3813a;
+  --color-amber-600: #96692c;
+  --color-amber-700: #775224;
+  --color-amber-800: #5c3f1e;
+  --color-amber-900: #452f18;
+  --color-amber-950: #2c1e10;
+
+  /* --- Dusk: hydration + info --- */
+  --color-sky-50:  #f2f5f8;
+  --color-sky-100: #e2e9f0;
+  --color-sky-200: #c4d2e0;
+  --color-sky-300: #9fb4c9;
+  --color-sky-400: #7d96b0;
+  --color-sky-500: #647f9b;
+  --color-sky-600: #51687f;
+  --color-sky-700: #425466;
+  --color-sky-800: #354351;
+  --color-sky-900: #2a343f;
+
+  --color-blue-50:  #f2f5f8;
+  --color-blue-100: #e2e9f0;
+  --color-blue-200: #c4d2e0;
+  --color-blue-300: #9fb4c9;
+  --color-blue-400: #7d96b0;
+  --color-blue-500: #647f9b;
+  --color-blue-600: #51687f;
+  --color-blue-700: #425466;
+
+  /* --- Plum: secondary data --- */
+  --color-purple-50:  #f7f3f6;
+  --color-purple-100: #ede4ec;
+  --color-purple-200: #dbc9d9;
+  --color-purple-300: #c1a6bf;
+  --color-purple-400: #a687a4;
+  --color-purple-500: #8b6b8a;
+  --color-purple-600: #735672;
+  --color-purple-700: #5c455b;
+  --color-purple-800: #493849;
+  --color-purple-900: #3a2d3a;
+
+  --color-indigo-500: #6b6b93;
+  --color-indigo-600: #57577a;
+  --color-teal-500: #5f8279;
+  --color-teal-600: #4c6a62;
+
+  /* --- Brick: alerts + heart rate --- */
+  --color-rose-50:  #fbf3f1;
+  --color-rose-100: #f6e4e0;
+  --color-rose-200: #eac8c1;
+  --color-rose-300: #d9a396;
+  --color-rose-400: #c47f70;
+  --color-rose-500: #ad6153;
+  --color-rose-600: #954c3f;
+  --color-rose-700: #7a3d33;
+  --color-rose-800: #61312a;
+  --color-rose-900: #4d2823;
+
+  --color-red-50:  #fbf3f1;
+  --color-red-100: #f6e4e0;
+  --color-red-200: #eac8c1;
+  --color-red-500: #ad6153;
+  --color-red-600: #954c3f;
+  --color-red-700: #7a3d33;
+
+  --color-pink-50:  #f9f2f3;
+  --color-pink-100: #f1e2e4;
+  --color-pink-400: #bb8189;
+  --color-pink-500: #a66872;
+  --color-pink-600: #8c525c;
+  --color-pink-700: #714349;
 }
 
-/* ============================================
-   APPLE LIGHT GLASSMORPHISM SYSTEM (iOS / macOS)
-   ============================================ */
-
 :root {
-  --bg-canvas: #f4f6f8;
-  --text-main: #0f172a;
-  --text-sub: #475569;
-  --text-muted: #94a3b8;
-  --color-bg: #f4f6f8;
-  --shadow-modal: 0 24px 60px -12px rgba(15, 23, 42, 0.28);
+  --bg-canvas: #f5f4ee;
+  --surface: #fefdfb;
+  --surface-sunken: #faf9f5;
+  --border-hair: #e6e3d8;
+  --border-strong: #d2cec1;
+  --text-main: #141413;
+  --text-sub: #4a4842;
+  --text-muted: #736f67;
+  --clay: #d97757;          /* accent: tints, rings, charts, focus */
+  --clay-solid: #b85a38;    /* solid fills carrying white text (AA) */
+  --clay-solid-hover: #a04f30;
+  --clay-deep: #c0603f;
+  --color-bg: #f5f4ee;
+  --shadow-card: 0 1px 2px rgba(20, 20, 19, 0.04);
+  --shadow-raised: 0 2px 8px rgba(20, 20, 19, 0.06);
+  --shadow-modal: 0 24px 60px -16px rgba(20, 20, 19, 0.28);
+  --radius-card: 16px;
+  --radius-control: 10px;
 }
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #f4f6f8;
-  background-image: 
-    radial-gradient(at 5% 5%, rgba(16, 185, 129, 0.07) 0px, transparent 40%),
-    radial-gradient(at 95% 10%, rgba(56, 189, 248, 0.08) 0px, transparent 40%),
-    radial-gradient(at 50% 90%, rgba(249, 115, 22, 0.06) 0px, transparent 45%);
-  background-attachment: fixed;
+  background-color: var(--bg-canvas);
   color: var(--text-main);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+  letter-spacing: -0.006em;
 }
 
-/* --- Apple Frosted Glass Card --- */
-.card {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(25px) saturate(190%);
-  -webkit-backdrop-filter: blur(25px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 22px;
-  box-shadow: 
-    0 4px 20px -2px rgba(0, 0, 0, 0.03),
-    0 10px 35px -4px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
-  padding: 24px;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-}
-
-.card:not(.card-hero-green):hover {
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 
-    0 8px 30px -2px rgba(0, 0, 0, 0.05),
-    0 16px 45px -4px rgba(16, 185, 129, 0.1),
-    inset 0 1px 0 0 #ffffff;
-  transform: translateY(-2px);
-  border-color: rgba(16, 185, 129, 0.35);
-}
-
-.card-hero-green {
-  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 12px 35px -5px rgba(5, 150, 105, 0.35) !important;
-  color: #ffffff !important;
-}
-
-.card-hero-green:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 45px -5px rgba(5, 150, 105, 0.45) !important;
-  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
-}
-
-/* --- Apple Pill Badges --- */
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 13px;
-  border-radius: 9999px;
-  font-size: 12.5px;
-  font-weight: 700;
-  white-space: nowrap;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: all 0.2s ease;
-}
-
-.pill-green {
-  background: rgba(16, 185, 129, 0.12);
-  color: #047857;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-}
-
-.pill-coral {
-  background: rgba(249, 115, 22, 0.12);
-  color: #c2410c;
-  border: 1px solid rgba(249, 115, 22, 0.25);
-}
-
-.pill-blue {
-  background: rgba(56, 189, 248, 0.14);
-  color: #0369a1;
-  border: 1px solid rgba(56, 189, 248, 0.25);
-}
-
-.pill-purple {
-  background: rgba(168, 85, 247, 0.12);
-  color: #6b21a8;
-  border: 1px solid rgba(168, 85, 247, 0.25);
-}
-
-.pill-gray {
-  background: rgba(0, 0, 0, 0.05);
-  color: #475569;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.pill-amber {
-  background: rgba(245, 158, 11, 0.12);
-  color: #b45309;
-  border: 1px solid rgba(245, 158, 11, 0.25);
-}
-
-.pill-orange {
-  background: rgba(234, 88, 12, 0.12);
-  color: #c2410c;
-  border: 1px solid rgba(234, 88, 12, 0.25);
-}
-
-.pill-rose {
-  background: rgba(244, 63, 94, 0.12);
-  color: #be123c;
-  border: 1px solid rgba(244, 63, 94, 0.25);
-}
-
-.pill-pink {
-  background: rgba(236, 72, 153, 0.12);
-  color: #be185d;
-  border: 1px solid rgba(236, 72, 153, 0.25);
-}
-
-/* --- Apple Buttons --- */
-.btn-primary {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #ffffff;
-  font-weight: 700; font-size: 14px; border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.25); cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-}
-.btn-primary:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
-}
-.btn-primary:active { transform: translateY(0) scale(0.98); }
-
-.btn-secondary {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #0f172a;
-  font-weight: 600; font-size: 14px; border-radius: 14px;
-  border: 1px solid rgba(0, 0, 0, 0.08); cursor: pointer;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-}
-.btn-secondary:hover {
-  background: #ffffff;
-  border-color: rgba(16, 185, 129, 0.4);
-  transform: translateY(-1px);
-}
-
-.btn-coral {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  color: #ffffff;
-  font-weight: 700; font-size: 14px; border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.25); cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
-}
-.btn-coral:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
-}
-
-/* --- Apple Inputs --- */
-.input-field {
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 14px;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #0f172a;
-  outline: none;
-  transition: all 0.2s ease;
-  width: 100%;
-}
-.input-field:focus {
-  background: #ffffff;
-  border-color: #10b981;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
-}
-.input-field::placeholder { color: #94a3b8; }
-
-select.input-field {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 5.646a.5.5 0 0 1 .708 0L8 8.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  padding-right: 40px;
-}
-
-/* --- Apple Segmented Tab Control --- */
-.tab-pill {
-  padding: 8px 18px;
-  border-radius: 9999px;
-  font-size: 13px;
+/* Editorial display face for page and section titles. Serif at heavy
+   weights turns shouty, so display text tops out at 600. */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.018em;
   font-weight: 600;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  border: 1px solid transparent;
-  background: transparent;
-}
-.tab-pill:hover { color: #0f172a; background: rgba(0, 0, 0, 0.04); }
-.tab-pill.active {
-  background: #0f172a;
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
 }
 
-/* --- Check Circle --- */
-.check-circle {
-  width: 24px; height: 24px;
-  border-radius: 50%;
-  border: 2px solid #cbd5e1;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-  flex-shrink: 0;
-  padding: 0;
-  background: transparent;
+h1.font-display,
+h2.font-display {
+  font-weight: 600;
 }
-.check-circle:hover {
-  border-color: #10b981;
-  transform: scale(1.1);
+
+.font-display.font-extrabold,
+.font-display.font-bold {
+  font-weight: 600;
 }
-.check-circle.checked {
-  background: #10b981;
-  border-color: #10b981;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
-  transform: scale(1.05);
+
+/* Component classes live in the components layer so per-element Tailwind
+   utilities (bg-*, border-*, p-*) still win over them. Unlayered rules
+   would outrank every utility regardless of specificity. */
+@layer components {
+  /* --- Surface --- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border-hair);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 24px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    position: relative;
+  }
+
+  .card:not(.card-hero-green):hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-raised);
+  }
+
+  /* Feature panel — solid clay, no gradient sheen. */
+  .card-hero-green {
+    background: #a94f31 !important;
+    border: 1px solid rgba(20, 20, 19, 0.08) !important;
+    box-shadow: var(--shadow-card) !important;
+    color: #ffffff !important;
+  }
+
+  .card-hero-green:hover {
+    background: #9d4b31 !important;
+  }
+
+  /* --- Pills --- */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: -0.004em;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+
+  .pill-green {
+    background: #f6e7e0;
+    color: #9d4b31;
+    border: 1px solid #eecfc2;
+  }
+
+  .pill-coral {
+    background: #f5ead2;
+    color: #775224;
+    border: 1px solid #e9d3a6;
+  }
+
+  .pill-blue {
+    background: #e2e9f0;
+    color: #425466;
+    border: 1px solid #c4d2e0;
+  }
+
+  .pill-purple {
+    background: #ede4ec;
+    color: #5c455b;
+    border: 1px solid #dbc9d9;
+  }
+
+  .pill-gray {
+    background: #f2f0e9;
+    color: #565349;
+    border: 1px solid #e6e3d8;
+  }
+
+  .pill-amber {
+    background: #f5ead2;
+    color: #775224;
+    border: 1px solid #e9d3a6;
+  }
+
+  .pill-orange {
+    background: #f6e7e0;
+    color: #9d4b31;
+    border: 1px solid #eecfc2;
+  }
+
+  .pill-rose {
+    background: #f6e4e0;
+    color: #7a3d33;
+    border: 1px solid #eac8c1;
+  }
+
+  .pill-pink {
+    background: #f1e2e4;
+    color: #714349;
+    border: 1px solid #e3cdd0;
+  }
+
+  /* --- Buttons --- */
+  .btn-primary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 18px;
+    background: var(--clay-solid);
+    color: #ffffff;
+    font-weight: 600; font-size: 14px; border-radius: var(--radius-control);
+    border: 1px solid transparent; cursor: pointer;
+    letter-spacing: -0.006em;
+    transition: background 0.18s ease;
+  }
+  .btn-primary:hover { background: var(--clay-solid-hover); }
+  .btn-primary:active { background: #8f4629; }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 18px;
+    background: var(--surface);
+    color: var(--text-main);
+    font-weight: 600; font-size: 14px; border-radius: var(--radius-control);
+    border: 1px solid var(--border-strong); cursor: pointer;
+    letter-spacing: -0.006em;
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
+  .btn-secondary:hover {
+    background: var(--surface-sunken);
+    border-color: #b9b4a5;
+  }
+
+  /* Training actions — deep stone, so clay stays the single brand accent. */
+  .btn-coral {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 18px;
+    background: #2a2926;
+    color: #faf9f5;
+    font-weight: 600; font-size: 14px; border-radius: var(--radius-control);
+    border: 1px solid transparent; cursor: pointer;
+    letter-spacing: -0.006em;
+    transition: background 0.18s ease;
+  }
+  .btn-coral:hover { background: #141413; }
+
+  /* --- Inputs --- */
+  .input-field {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-control);
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    width: 100%;
+  }
+  .input-field:focus {
+    border-color: var(--clay);
+    box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.16);
+  }
+  .input-field::placeholder { color: var(--text-muted); }
+
+  select.input-field {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239c988d' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 5.646a.5.5 0 0 1 .708 0L8 8.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+
+  /* --- Segmented tabs --- */
+  .tab-pill {
+    padding: 7px 15px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-sub);
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    background: transparent;
+    letter-spacing: -0.006em;
+  }
+  .tab-pill:hover { color: var(--text-main); background: #eceadf; }
+  .tab-pill.active {
+    background: var(--surface);
+    color: var(--text-main);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* --- Check Circle --- */
+  .check-circle {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.18s ease, border-color 0.18s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    background: transparent;
+  }
+  .check-circle:hover { border-color: var(--clay); }
+  .check-circle.checked {
+    background: var(--clay);
+    border-color: var(--clay);
+  }
 }
 
 /* --- Progress Ring --- */
 .progress-ring-fill {
-  transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: stroke-dashoffset 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* --- Scrollbar --- */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-thumb { background: #d2cec1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #b9b4a5; }
 
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* --- Animations --- */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.96); }
+  from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
 }
-.animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-scale-in { animation: scaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-.divider { height: 1px; background: rgba(0, 0, 0, 0.06); }
+.divider { height: 1px; background: var(--border-hair); }
 .tabular-nums { font-variant-numeric: tabular-nums; }
 
-/* --- Keyboard Accessibility ---
-   Every interactive surface gets a visible ring when reached by keyboard,
-   without showing one on mouse clicks. */
+/* --- Keyboard Accessibility --- */
 :where(button, a, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid #10b981;
+  outline: 2px solid var(--clay);
   outline-offset: 2px;
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
-/* --- Reduced Motion ---
-   The card lifts, ring sweeps, and entrance animations are decorative, so
-   they are dropped entirely for users who ask for less movement. */
+/* --- Reduced Motion --- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -319,12 +467,5 @@ select.input-field {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .card:not(.card-hero-green):hover,
-  .btn-primary:hover,
-  .btn-coral:hover,
-  .btn-secondary:hover {
-    transform: none;
   }
 }

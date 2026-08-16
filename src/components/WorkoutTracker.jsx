@@ -103,7 +103,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
 
         <div className="flex items-center gap-2 flex-wrap">
           {/* Weight Unit Toggle */}
-          <div className="flex items-center bg-white p-1 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-xs">
             <button
               onClick={() => setWeightUnit('lbs')}
               className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
@@ -151,7 +151,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
       <div className="card !p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
               <Dumbbell className="w-6 h-6 text-orange-500" />
             </div>
             <div>
@@ -172,7 +172,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-black/5 rounded-full h-2.5 overflow-hidden">
+        <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
           <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-full transition-all duration-500" style={{ width: `${progress}%` }} />
         </div>
       </div>
@@ -189,7 +189,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
             <div key={ex.id} className="card !p-0 overflow-hidden">
               <button
                 onClick={() => setExpandedExercise(isOpen ? '' : ex.id)}
-                className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-slate-50/80 transition-colors"
+                className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-slate-50 transition-colors"
               >
                 <div>
                   <div className="flex items-center gap-2">
@@ -210,9 +210,9 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
 
               {/* Expanded Set Rows */}
               {isOpen && (
-                <div className="border-t border-slate-200/60 px-4 sm:px-5 pb-5 bg-slate-50/50">
+                <div className="border-t border-slate-200 px-4 sm:px-5 pb-5 bg-slate-50">
                   {ex.notes && (
-                    <div className="py-3 border-b border-slate-200/50">
+                    <div className="py-3 border-b border-slate-200">
                       <p className="text-xs text-slate-500 italic leading-relaxed">💡 {ex.notes}</p>
                     </div>
                   )}

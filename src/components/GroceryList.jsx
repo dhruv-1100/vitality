@@ -41,10 +41,10 @@ export default function GroceryList() {
     const isChecked = !!checks[item];
     return (
       <div
-        className={`flex items-center gap-3 rounded-2xl border transition-all ${
+        className={`flex items-center gap-3 rounded-xl border transition-all ${
           isChecked
             ? 'bg-emerald-500/10 border-emerald-500/25'
-            : 'bg-white/60 border-slate-200/60 hover:border-slate-300'
+            : 'bg-slate-50 border-slate-200 hover:border-slate-300'
         }`}
       >
         <button
@@ -80,7 +80,7 @@ export default function GroceryList() {
       {/* Header */}
       <div className="card !p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
             <ShoppingCart className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
@@ -123,7 +123,7 @@ export default function GroceryList() {
       {/* Custom Items */}
       <div className="card !p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-11 h-11 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
             <Package className="w-5 h-5 text-sky-500" />
           </div>
           <div>

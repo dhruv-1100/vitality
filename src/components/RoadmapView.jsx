@@ -26,7 +26,7 @@ export default function RoadmapView() {
       <div className="card !p-6">
         <div className="flex items-center justify-between gap-4 mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
               <Map className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
@@ -42,7 +42,7 @@ export default function RoadmapView() {
             const reached = i <= activeIndex;
             return (
               <div key={phase.id} className="flex-1 min-w-0">
-                <div className={`h-2.5 rounded-full transition-colors ${reached ? PHASE_COLORS[i].bar : 'bg-black/8'}`} />
+                <div className={`h-2.5 rounded-full transition-colors ${reached ? PHASE_COLORS[i].bar : 'bg-slate-200'}`} />
                 <p className="text-[10px] text-slate-400 font-semibold mt-2 truncate">{phase.dates}</p>
               </div>
             );
@@ -63,8 +63,8 @@ export default function RoadmapView() {
               <div className="flex items-start gap-4">
                 {/* Timeline */}
                 <div className="flex flex-col items-center pt-0.5 shrink-0">
-                  <div className={`w-11 h-11 rounded-2xl flex items-center justify-center border ${
-                    isActive ? `${colors.tint} ${colors.border}` : 'bg-black/5 border-black/5'
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center border ${
+                    isActive ? `${colors.tint} ${colors.border}` : 'bg-slate-100 border-slate-200'
                   }`}>
                     <Icon className={`w-5 h-5 ${isActive ? colors.accent : 'text-slate-400'}`} />
                   </div>
@@ -81,7 +81,7 @@ export default function RoadmapView() {
                   <p className="text-xs text-slate-400 font-semibold mb-2">{phase.dates}</p>
                   <p className="text-sm text-slate-600 leading-relaxed">{phase.goal}</p>
 
-                  <div className="flex items-center gap-6 mt-4 pt-4 border-t border-slate-200/60">
+                  <div className="flex items-center gap-6 mt-4 pt-4 border-t border-slate-200">
                     <div>
                       <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Effort</p>
                       <p className="text-sm font-bold text-slate-800 mt-0.5">{phase.effort}</p>
@@ -93,7 +93,7 @@ export default function RoadmapView() {
                   </div>
 
                   {phase.focus && (
-                    <p className="text-xs text-slate-500 mt-3 leading-relaxed bg-slate-50/80 p-3 rounded-xl border border-slate-200/50">
+                    <p className="text-xs text-slate-500 mt-3 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
                       📌 {phase.focus}
                     </p>
                   )}
@@ -106,7 +106,7 @@ export default function RoadmapView() {
 
       {/* Final Target */}
       <div className="card card-hero-green !p-8 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center mx-auto mb-4">
+        <div className="w-14 h-14 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center mx-auto mb-4">
           <Award className="w-7 h-7 text-white" />
         </div>
         <h3 className="text-xl font-extrabold text-white font-display">December 2026 Target</h3>
