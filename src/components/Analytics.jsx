@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { TrendingUp, Target, AlertCircle, Scale, Ruler, Flame, Heart, Activity, Footprints, Moon, Dumbbell, Zap, Award, CheckCircle2, BarChart2 } from 'lucide-react';
+import { TrendingUp, Target, AlertCircle, Scale, Ruler, Flame, Dumbbell, Zap, Watch } from 'lucide-react';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend, Filler } from 'chart.js';
-import { getWeeklyWeightLogs, getWorkoutLogs, getCompletedCalendarDays, getAppleWatchLogs } from '../utils/storage';
-import { WEIGHT_CHECKPOINTS, PHASES, AUGUST_CALENDAR } from '../utils/transformationData';
+import { getWeeklyWeightLogs, getWorkoutLogs, getCompletedCalendarDays, getAppleWatchLogs, getLocalDateString, parseLocalDate } from '../utils/storage';
+import { COLORS } from '../utils/theme';
+import { WEIGHT_CHECKPOINTS, AUGUST_CALENDAR } from '../utils/transformationData';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend, Filler);
 
@@ -18,7 +19,6 @@ export default function Analytics() {
   const waists = logs.map(l => l.waistInches);
 
   // Velocity calculations
-  const deltas = weights.map((w, i) => i === 0 ? 0 : +(w - weights[i - 1]).toFixed(2));
   const avgGain = weights.length > 1 ? +((weights[weights.length - 1] - weights[0]) / (weights.length - 1)).toFixed(2) : 0;
   const latestWeight = weights.length > 0 ? weights[weights.length - 1] : 59.3;
   const latestWaist = waists.length > 0 ? waists[waists.length - 1] : 29.1;
@@ -35,9 +35,18 @@ export default function Analytics() {
     })
   ]);
   const totalCompletedSessions = completedWorkoutDates.size;
-  const adherenceRate = Math.min(100, Math.round((totalCompletedSessions / 5) * 100)); // Target ~5 sessions/week
+
+  // Adherence compares completed sessions against the sessions actually
+  // scheduled up to today — dividing the running total by one week's target
+  // let the figure climb past 100% and pin itself there.
+  const todayStr = getLocalDateString();
+  const scheduledToDate = AUGUST_CALENDAR.filter(c => c.session !== 'Rest' && c.date <= todayStr).length;
+  const adherenceRate = scheduledToDate > 0
+    ? Math.min(100, Math.round((totalCompletedSessions / scheduledToDate) * 100))
+    : 0;
 
   const gainStatus = avgGain >= 0.15 && avgGain <= 0.35 ? 'on-track' : avgGain < 0.15 ? 'slow' : 'fast';
+  const signed = (n) => `${n > 0 ? '+' : ''}${n}`;
 
   // 1. Weight Chart Data
   const weightChartData = {
@@ -46,11 +55,11 @@ export default function Analytics() {
       {
         label: 'Weight (kg)',
         data: weights,
-        borderColor: '#22c55e',
-        backgroundColor: 'rgba(34, 197, 94, 0.12)',
+        borderColor: COLORS.clay,
+        backgroundColor: COLORS.clayWash,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#22c55e',
+        pointBackgroundColor: COLORS.clay,
         pointRadius: 6,
         pointHoverRadius: 8,
         borderWidth: 3,
@@ -65,11 +74,11 @@ export default function Analytics() {
       {
         label: 'Waist (inches)',
         data: waists,
-        borderColor: '#38bdf8',
-        backgroundColor: 'rgba(56, 189, 248, 0.12)',
+        borderColor: COLORS.dusk,
+        backgroundColor: COLORS.duskWash,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#38bdf8',
+        pointBackgroundColor: COLORS.dusk,
         pointRadius: 6,
         pointHoverRadius: 8,
         borderWidth: 3,
@@ -77,22 +86,25 @@ export default function Analytics() {
     ],
   };
 
-  // 3. Apple Watch Telemetry Bar Chart
-  const watchDates = Object.keys(watchLogs).slice(-7);
+  // 3. Apple Watch Telemetry Bar Chart — sorted chronologically, since object
+  // key order is not guaranteed to be the order entries were logged in.
+  const watchDates = Object.keys(watchLogs).sort().slice(-7);
+  const hasWatchData = watchDates.length > 0;
   const watchBarData = {
-    labels: watchDates.length > 0 ? watchDates.map(d => d.split('-').slice(1).join('/')) : ['Thu 7/30'],
+    labels: watchDates.map(d => parseLocalDate(d).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })),
     datasets: [
       {
         label: 'Active Cals (kcal)',
-        data: watchDates.length > 0 ? watchDates.map(d => watchLogs[d]?.activeCalories || watchLogs[d]?.dailyActiveCalories || 720) : [720],
-        backgroundColor: '#22c55e',
-        borderRadius: 8,
+        // null leaves a gap in the bar chart rather than inventing a number.
+        data: watchDates.map(d => watchLogs[d]?.activeCalories ?? watchLogs[d]?.dailyActiveCalories ?? null),
+        backgroundColor: COLORS.clay,
+        borderRadius: 6,
       },
       {
         label: 'Workout Burn (kcal)',
-        data: watchDates.length > 0 ? watchDates.map(d => watchLogs[d]?.workoutCalories || 450) : [450],
-        backgroundColor: '#f97316',
-        borderRadius: 8,
+        data: watchDates.map(d => watchLogs[d]?.workoutCalories ?? null),
+        backgroundColor: COLORS.dusk,
+        borderRadius: 6,
       }
     ]
   };
@@ -103,7 +115,7 @@ export default function Analytics() {
     datasets: [
       {
         data: [600, 1400, 765], // 600 kcal from P, 1400 from C, 765 from F = ~2765 kcal
-        backgroundColor: ['#fb923c', '#38bdf8', '#34d399'],
+        backgroundColor: [COLORS.clay, COLORS.dusk, COLORS.ochre],
         borderWidth: 0,
       }
     ]
@@ -115,7 +127,7 @@ export default function Analytics() {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#0f172a',
+        backgroundColor: COLORS.ink,
         titleFont: { family: 'Inter', size: 12, weight: 'bold' },
         bodyFont: { family: 'Inter', size: 12 },
         padding: 12,
@@ -127,8 +139,8 @@ export default function Analytics() {
       },
     },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#64748b' } },
-      y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#64748b' } },
+      x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: COLORS.stone } },
+      y: { grid: { color: COLORS.hairline }, ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: COLORS.stone } },
     },
   });
 
@@ -181,7 +193,9 @@ export default function Analytics() {
             <span className="text-3xl font-extrabold text-slate-900 font-display tabular-nums">{totalCompletedSessions}</span>
             <span className="text-sm font-bold text-slate-400">workouts</span>
           </div>
-          <p className="text-[11px] text-orange-600 font-bold mt-1">{adherenceRate}% Weekly Goal</p>
+          <p className="text-[11px] text-orange-600 font-bold mt-1">
+            {adherenceRate}% of {scheduledToDate} scheduled to date
+          </p>
         </div>
 
         <div className="card !p-5">
@@ -192,7 +206,7 @@ export default function Analytics() {
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Gain Rate</span>
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-3xl font-extrabold text-slate-900 font-display tabular-nums">+{avgGain}</span>
+            <span className="text-3xl font-extrabold text-slate-900 font-display tabular-nums">{signed(avgGain)}</span>
             <span className="text-sm font-bold text-slate-400">kg/wk</span>
           </div>
           <p className="text-[11px] text-purple-600 font-bold mt-1">Target: +0.25 kg/wk</p>
@@ -206,7 +220,7 @@ export default function Analytics() {
         'border-l-rose-500 bg-rose-500/10'
       }`}>
         <div className="flex items-center gap-3.5">
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
             gainStatus === 'on-track' ? 'bg-emerald-500/20 text-emerald-600' :
             gainStatus === 'slow' ? 'bg-amber-500/20 text-amber-600' : 'bg-rose-500/20 text-rose-600'
           }`}>
@@ -219,7 +233,7 @@ export default function Analytics() {
                'Velocity: High Surplus (Monitor waist measurement)'}
             </p>
             <p className="text-xs text-slate-500 mt-0.5 font-medium">
-              Average rate: <span className="font-bold text-slate-900">+{avgGain} kg/week</span> &middot; Target range: <span className="font-bold text-emerald-600">+0.20 to +0.35 kg/week</span> for clean muscle growth.
+              Average rate: <span className="font-bold text-slate-900">{signed(avgGain)} kg/week</span> &middot; Target range: <span className="font-bold text-emerald-600">+0.20 to +0.35 kg/week</span> for clean muscle growth.
             </p>
           </div>
         </div>
@@ -231,7 +245,7 @@ export default function Analytics() {
         <div className="card !p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                 <Scale className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
@@ -250,7 +264,7 @@ export default function Analytics() {
         <div className="card !p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
                 <Ruler className="w-5 h-5 text-sky-500" />
               </div>
               <div>
@@ -272,7 +286,7 @@ export default function Analytics() {
         <div className="card !p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
                 <Flame className="w-5 h-5 text-orange-500" />
               </div>
               <div>
@@ -282,18 +296,26 @@ export default function Analytics() {
             </div>
           </div>
           <div className="h-60">
-            <Bar
-              data={watchBarData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: true, position: 'top', labels: { font: { family: 'Inter', size: 11, weight: '600' } } } },
-                scales: {
-                  x: { grid: { display: false } },
-                  y: { grid: { color: 'rgba(0,0,0,0.04)' } }
-                }
-              }}
-            />
+            {hasWatchData ? (
+              <Bar
+                data={watchBarData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { display: true, position: 'top', labels: { font: { family: 'Inter', size: 11, weight: '600' } } } },
+                  scales: {
+                    x: { grid: { display: false } },
+                    y: { grid: { color: COLORS.hairline } }
+                  }
+                }}
+              />
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center">
+                <Watch className="w-10 h-10 text-slate-300 mb-3" />
+                <p className="text-sm font-semibold text-slate-500">No watch telemetry logged yet</p>
+                <p className="text-xs text-slate-400 mt-1">Log stats from the Dashboard to populate this chart.</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -343,7 +365,7 @@ export default function Analytics() {
           {WEIGHT_CHECKPOINTS.map((cp, i) => {
             const hit = latestWeight >= cp.targetKg;
             return (
-              <div key={i} className={`p-4 rounded-2xl border transition-all ${hit ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white/60 border-slate-200/60'}`}>
+              <div key={i} className={`p-4 rounded-xl border transition-all ${hit ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-slate-50 border-slate-200'}`}>
                 <div className="flex items-center justify-between mb-2">
                   <span className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold ${hit ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'}`}>
                     {hit ? '✓' : i + 1}

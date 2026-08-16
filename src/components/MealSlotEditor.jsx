@@ -40,10 +40,10 @@ export default function MealSlotEditor({ meal, slotIdx, alternatives, hasCustomS
   };
 
   return (
-    <div className="border-t border-slate-200/60 bg-slate-50/90 p-4 rounded-b-2xl space-y-4 animate-fade-in">
+    <div className="border-t border-slate-200 bg-slate-50 p-4 rounded-b-xl space-y-4 animate-fade-in">
       {/* Sub-tab navigation header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200/80 shadow-xs">
+        <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200 shadow-xs">
           <button
             onClick={() => setActiveSubTab('suggested')}
             className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all ${
@@ -96,7 +96,7 @@ export default function MealSlotEditor({ meal, slotIdx, alternatives, hasCustomS
             <div
               key={ai}
               onClick={() => onSelectMeal(alt)}
-              className="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-emerald-500/60 hover:bg-emerald-50/50 cursor-pointer transition-all space-y-1 group"
+              className="p-3 rounded-xl bg-white border border-slate-200 hover:border-emerald-500/60 hover:bg-emerald-50/50 cursor-pointer transition-all space-y-1 group"
             >
               <div className="flex items-center justify-between">
                 <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">{alt.name}</p>
@@ -122,7 +122,7 @@ export default function MealSlotEditor({ meal, slotIdx, alternatives, hasCustomS
                 className="input-field !pl-9 text-xs"
               />
             </div>
-            <div className="flex items-center gap-1 bg-white px-2.5 py-1.5 rounded-xl border border-slate-200/80 shrink-0">
+            <div className="flex items-center gap-1 bg-white px-2.5 py-1.5 rounded-xl border border-slate-200 shrink-0">
               <span className="text-[10px] font-bold text-slate-400">Qty:</span>
               <select
                 value={servingMultiplier}
@@ -179,7 +179,7 @@ export default function MealSlotEditor({ meal, slotIdx, alternatives, hasCustomS
 
       {/* Mode 3: Custom Food Input */}
       {activeSubTab === 'custom' && (
-        <form onSubmit={handleAddCustomMeal} className="bg-white p-3.5 rounded-xl border border-slate-200/80 space-y-3">
+        <form onSubmit={handleAddCustomMeal} className="bg-white p-3.5 rounded-xl border border-slate-200 space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-sky-500" />

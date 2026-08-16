@@ -12,7 +12,6 @@ import RoadmapView from './components/RoadmapView';
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedRoutine, setSelectedRoutine] = useState('Push A');
-  const [activeScenario, setActiveScenario] = useState('Scenario A');
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--color-bg)' }}>
@@ -23,8 +22,6 @@ export default function App() {
           <Dashboard
             setActiveTab={setActiveTab}
             setSelectedRoutine={setSelectedRoutine}
-            activeScenario={activeScenario}
-            setActiveScenario={setActiveScenario}
           />
         )}
         {activeTab === 'next' && (
@@ -45,21 +42,16 @@ export default function App() {
             setSelectedRoutine={setSelectedRoutine}
           />
         )}
-        {activeTab === 'diet' && (
-          <DietHub
-            activeScenario={activeScenario}
-            setActiveScenario={setActiveScenario}
-          />
-        )}
+        {activeTab === 'diet' && <DietHub />}
         {activeTab === 'grocery' && <GroceryList />}
         {activeTab === 'analytics' && <Analytics />}
         {activeTab === 'roadmap' && <RoadmapView />}
       </main>
 
-      <footer className="border-t border-gray-100 py-5 text-center">
+      <footer className="border-t border-black/5 py-5 text-center">
         <div className="max-w-6xl mx-auto px-5 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span className="text-xs text-gray-400">Vitality — Scientific Lean Bulk Tracker</span>
-          <span className="text-xs font-semibold text-gray-500">2,800 kcal · 150g Protein · 5× PPL</span>
+          <span className="text-xs text-slate-400 font-medium">Vitality — Scientific Lean Bulk Tracker</span>
+          <span className="text-xs font-bold text-slate-500">2,800 kcal · 150g Protein · 5× PPL</span>
         </div>
       </footer>
     </div>

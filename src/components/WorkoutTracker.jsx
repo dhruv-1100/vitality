@@ -1,23 +1,43 @@
-import React, { useState } from 'react';
-import { Dumbbell, CheckCircle2, Circle, ChevronDown, ChevronUp, Trophy, Timer, Calendar } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Dumbbell, Circle, ChevronDown, ChevronUp, Trophy, Timer, Save } from 'lucide-react';
 import { WORKOUT_ROUTINES } from '../utils/transformationData';
-import { getWorkoutLogs, saveWorkoutLog, getLocalDateString, getCompletedCalendarDays, toggleCalendarDayCompleted } from '../utils/storage';
-import RestTimerModal from './RestTimerModal';
+import { getWorkoutLogs, saveWorkoutLog, saveWorkoutDraft, getLocalDateString, getCompletedCalendarDays, toggleCalendarDayCompleted } from '../utils/storage';
+import RestTimerModal, { parseRestToSeconds } from './RestTimerModal';
 import confetti from 'canvas-confetti';
 
 export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) {
   const routine = WORKOUT_ROUTINES[selectedRoutine];
-  const [workoutDate, setWorkoutDate] = useState(getLocalDateString());
-  const [weightUnit, setWeightUnit] = useState('lbs'); // 'lbs' default for machines & free weights
+  const [workoutDate, setWorkoutDate] = useState(getLocalDateString);
 
-  const workoutLogs = getWorkoutLogs();
-  const existingLog = workoutLogs[workoutDate] || {};
-
-  const [exerciseLogs, setExerciseLogs] = useState(existingLog.exercises || {});
+  const initialLog = getWorkoutLogs()[workoutDate] || {};
+  const [weightUnit, setWeightUnit] = useState(initialLog.unit || 'lbs');
+  const [exerciseLogs, setExerciseLogs] = useState(initialLog.exercises || {});
   const [expandedExercise, setExpandedExercise] = useState(routine?.exercises?.[0]?.id || '');
   const [showTimer, setShowTimer] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(120);
-  const [completed, setCompleted] = useState(!!existingLog.completed);
+  const [completed, setCompleted] = useState(!!initialLog.completed);
+
+  // Skips the persist on the very first render so simply opening the tab does
+  // not write an empty draft over an existing log.
+  const hydratedRef = useRef(false);
+
+  useEffect(() => {
+    if (!hydratedRef.current) {
+      hydratedRef.current = true;
+      return;
+    }
+    if (Object.keys(exerciseLogs).length === 0 && !completed) return;
+    saveWorkoutDraft(workoutDate, { routineName: selectedRoutine, exercises: exerciseLogs, unit: weightUnit });
+  }, [exerciseLogs, weightUnit, workoutDate, selectedRoutine, completed]);
+
+  // Pull whatever is already stored whenever the target date or routine changes.
+  const loadLogFor = (date, routineName) => {
+    const stored = getWorkoutLogs()[date] || {};
+    const matchesRoutine = !stored.routineName || stored.routineName === routineName;
+    setExerciseLogs(matchesRoutine ? (stored.exercises || {}) : {});
+    setCompleted(matchesRoutine ? !!stored.completed : false);
+    if (stored.unit) setWeightUnit(stored.unit);
+  };
 
   if (!routine) return (
     <div className="card !p-12 text-center">
@@ -29,20 +49,24 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
   const getSetLog = (exId, setIdx) => exerciseLogs[exId]?.[setIdx] || { weight: '', reps: '', done: false, unit: weightUnit };
 
   const updateSet = (exId, setIdx, field, value) => {
-    setExerciseLogs(prev => {
-      const updated = { ...prev };
-      if (!updated[exId]) updated[exId] = {};
-      if (!updated[exId][setIdx]) updated[exId][setIdx] = { weight: '', reps: '', done: false, unit: weightUnit };
-      updated[exId][setIdx] = { ...updated[exId][setIdx], [field]: value };
-      return updated;
-    });
+    setExerciseLogs(prev => ({
+      ...prev,
+      [exId]: {
+        ...prev[exId],
+        [setIdx]: {
+          ...(prev[exId]?.[setIdx] || { weight: '', reps: '', done: false }),
+          unit: weightUnit,
+          [field]: value
+        }
+      }
+    }));
   };
 
   const toggleSetDone = (exId, setIdx) => {
     const cur = getSetLog(exId, setIdx);
     updateSet(exId, setIdx, 'done', !cur.done);
     if (!cur.done) {
-      setTimerSeconds(parseInt(routine.exercises.find(e => e.id === exId)?.rest) || 120);
+      setTimerSeconds(parseRestToSeconds(routine.exercises.find(e => e.id === exId)?.rest));
       setShowTimer(true);
     }
   };
@@ -71,12 +95,15 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 animate-fade-in">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">Workout Tracker</h1>
-          <p className="text-sm text-slate-500 mt-0.5 font-medium">Log machines & free weights in lbs</p>
+          <p className="text-sm text-slate-500 mt-0.5 font-medium flex items-center gap-1.5">
+            <Save className="w-3.5 h-3.5 text-emerald-600" />
+            Every set saves as you type — leave and come back anytime
+          </p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           {/* Weight Unit Toggle */}
-          <div className="flex items-center bg-white p-1 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-xs">
             <button
               onClick={() => setWeightUnit('lbs')}
               className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
@@ -101,9 +128,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
             value={workoutDate}
             onChange={(e) => {
               setWorkoutDate(e.target.value);
-              const logForDate = workoutLogs[e.target.value] || {};
-              setExerciseLogs(logForDate.exercises || {});
-              setCompleted(!!logForDate.completed);
+              loadLogFor(e.target.value, selectedRoutine);
             }}
             className="input-field !w-auto text-xs font-bold"
           />
@@ -113,8 +138,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
             value={selectedRoutine}
             onChange={(e) => {
               setSelectedRoutine(e.target.value);
-              setExerciseLogs({});
-              setCompleted(false);
+              loadLogFor(workoutDate, e.target.value);
             }}
             className="input-field !w-auto text-xs font-bold"
           >
@@ -127,7 +151,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
       <div className="card !p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
               <Dumbbell className="w-6 h-6 text-orange-500" />
             </div>
             <div>
@@ -148,7 +172,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-black/5 rounded-full h-2.5 overflow-hidden">
+        <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
           <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-full transition-all duration-500" style={{ width: `${progress}%` }} />
         </div>
       </div>
@@ -165,7 +189,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
             <div key={ex.id} className="card !p-0 overflow-hidden">
               <button
                 onClick={() => setExpandedExercise(isOpen ? '' : ex.id)}
-                className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-slate-50/80 transition-colors"
+                className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-slate-50 transition-colors"
               >
                 <div>
                   <div className="flex items-center gap-2">
@@ -186,9 +210,9 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
 
               {/* Expanded Set Rows */}
               {isOpen && (
-                <div className="border-t border-slate-200/60 px-4 sm:px-5 pb-5 bg-slate-50/50">
+                <div className="border-t border-slate-200 px-4 sm:px-5 pb-5 bg-slate-50">
                   {ex.notes && (
-                    <div className="py-3 border-b border-slate-200/50">
+                    <div className="py-3 border-b border-slate-200">
                       <p className="text-xs text-slate-500 italic leading-relaxed">💡 {ex.notes}</p>
                     </div>
                   )}
@@ -214,7 +238,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
                               type="number"
                               value={log.weight}
                               onChange={(e) => updateSet(ex.id, si, 'weight', e.target.value)}
-                              placeholder={`lbs`}
+                              placeholder={weightUnit}
                               className="input-field text-sm !py-2 !px-3 font-bold"
                             />
                             <span className="absolute right-2 text-[10px] font-bold text-slate-400 pointer-events-none">{weightUnit}</span>
@@ -266,7 +290,7 @@ export default function WorkoutTracker({ selectedRoutine, setSelectedRoutine }) 
         </div>
       )}
 
-      {showTimer && <RestTimerModal defaultSeconds={timerSeconds} onClose={() => setShowTimer(false)} />}
+      {showTimer && <RestTimerModal seconds={timerSeconds} onClose={() => setShowTimer(false)} />}
     </div>
   );
 }
