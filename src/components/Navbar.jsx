@@ -25,6 +25,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
     a.href = url;
     a.download = `vitality_backup_${new Date().toISOString().split('T')[0]}.json`;
     a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleImport = () => {

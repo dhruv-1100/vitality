@@ -226,6 +226,16 @@ export const MEAL_TIMETABLES_MAP = {
   "Weekend / Non-Class Prep": MEAL_TIMETABLE_WEEKEND
 };
 
+export const WEEKDAYS = [
+  { day: 'Sun', fullName: 'Sunday', defaultPlan: 'Weekend / Non-Class Prep' },
+  { day: 'Mon', fullName: 'Monday', defaultPlan: 'Scenario A (Mon/Wed Class)' },
+  { day: 'Tue', fullName: 'Tuesday', defaultPlan: 'Scenario B (Tue/Thu Class)' },
+  { day: 'Wed', fullName: 'Wednesday', defaultPlan: 'Scenario A (Mon/Wed Class)' },
+  { day: 'Thu', fullName: 'Thursday', defaultPlan: 'Scenario B (Tue/Thu Class)' },
+  { day: 'Fri', fullName: 'Friday', defaultPlan: 'Weekend / Non-Class Prep' },
+  { day: 'Sat', fullName: 'Saturday', defaultPlan: 'Weekend / Non-Class Prep' },
+];
+
 export const TIME_SLOT_ALTERNATIVES = {
   "Wake Up": [
     { name: "Banana + Coffee", detail: "1 large banana + black coffee", protein: "0g", cals: "100" },
@@ -266,6 +276,26 @@ export const TIME_SLOT_ALTERNATIVES = {
     { name: "Double Whey Shake", detail: "500ml milk + 2 scoops Whey (Quick 60g hit)", protein: "60g", cals: "480" },
     { name: "Cottage Cheese / Paneer Cube", detail: "100g raw paneer / cottage cheese", protein: "18g", cals: "260" }
   ]
+};
+
+// Maps a timetable slot's label onto its alternatives group. Ordered most
+// specific first, because several labels contain more than one keyword
+// (e.g. "Post-Workout Breakfast", "Pre-Class Quick Lunch").
+const SLOT_ALTERNATIVE_RULES = [
+  { match: /gym|training/i, group: null },
+  { match: /wake up|hydrate/i, group: 'Wake Up' },
+  { match: /breakfast/i, group: 'Breakfast' },
+  { match: /bed|bedtime/i, group: 'Bedtime' },
+  { match: /lunch/i, group: 'Lunch' },
+  { match: /dinner/i, group: 'Dinner' },
+  { match: /snack/i, group: 'Snack' },
+];
+
+// Returns null for slots that have no sensible swap (the gym window is not a meal).
+export const getAlternativesForSlot = (mealName = '') => {
+  const rule = SLOT_ALTERNATIVE_RULES.find(r => r.match.test(mealName));
+  if (!rule) return TIME_SLOT_ALTERNATIVES.Lunch;
+  return rule.group ? TIME_SLOT_ALTERNATIVES[rule.group] : null;
 };
 
 export const BATCH_COOKING_SESSIONS = [

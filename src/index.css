@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap');
+/* Inter + Outfit are loaded via the <link> in index.html — importing them here
+   too fired a second, render-blocking request for the same families. */
 
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -22,6 +23,8 @@
   --text-main: #0f172a;
   --text-sub: #475569;
   --text-muted: #94a3b8;
+  --color-bg: #f4f6f8;
+  --shadow-modal: 0 24px 60px -12px rgba(15, 23, 42, 0.28);
 }
 
 body {
@@ -121,6 +124,30 @@ body {
   background: rgba(0, 0, 0, 0.05);
   color: #475569;
   border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.pill-amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.pill-orange {
+  background: rgba(234, 88, 12, 0.12);
+  color: #c2410c;
+  border: 1px solid rgba(234, 88, 12, 0.25);
+}
+
+.pill-rose {
+  background: rgba(244, 63, 94, 0.12);
+  color: #be123c;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.pill-pink {
+  background: rgba(236, 72, 153, 0.12);
+  color: #be185d;
+  border: 1px solid rgba(236, 72, 153, 0.25);
 }
 
 /* --- Apple Buttons --- */
@@ -229,6 +256,8 @@ select.input-field {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   flex-shrink: 0;
+  padding: 0;
+  background: transparent;
 }
 .check-circle:hover {
   border-color: #10b981;
@@ -269,3 +298,33 @@ select.input-field {
 
 .divider { height: 1px; background: rgba(0, 0, 0, 0.06); }
 .tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* --- Keyboard Accessibility ---
+   Every interactive surface gets a visible ring when reached by keyboard,
+   without showing one on mouse clicks. */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* --- Reduced Motion ---
+   The card lifts, ring sweeps, and entrance animations are decorative, so
+   they are dropped entirely for users who ask for less movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card:not(.card-hero-green):hover,
+  .btn-primary:hover,
+  .btn-coral:hover,
+  .btn-secondary:hover {
+    transform: none;
+  }
+}

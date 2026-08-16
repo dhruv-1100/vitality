@@ -1,29 +1,27 @@
 import React, { useState } from 'react';
-import { Utensils, Clock, ChefHat, ChevronDown, ChevronUp, AlertTriangle, Zap, RefreshCw, CalendarDays } from 'lucide-react';
-import { MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLE_SCENARIO_B, MEAL_TIMETABLE_WEEKEND, MEAL_TIMETABLES_MAP, BATCH_COOKING_SESSIONS, PROTEIN_ROTATIONS, EMERGENCY_MEALS, PRE_WORKOUT_CARBS } from '../utils/transformationData';
-import { getProteinRotation, setProteinRotation } from '../utils/storage';
+import { Clock, ChefHat, ChevronDown, ChevronUp, AlertTriangle, Zap, RefreshCw, CalendarDays } from 'lucide-react';
+import { MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLES_MAP, BATCH_COOKING_SESSIONS, PROTEIN_ROTATIONS, EMERGENCY_MEALS, PRE_WORKOUT_CARBS, WEEKDAYS } from '../utils/transformationData';
+import { getProteinRotation, setProteinRotation, getLocalDateString, getDayName } from '../utils/storage';
 import GroceryList from './GroceryList';
-
-const WEEKDAYS = [
-  { day: 'Mon', fullName: 'Monday', defaultPlan: 'Scenario A (Mon/Wed Class)' },
-  { day: 'Tue', fullName: 'Tuesday', defaultPlan: 'Scenario B (Tue/Thu Class)' },
-  { day: 'Wed', fullName: 'Wednesday', defaultPlan: 'Scenario A (Mon/Wed Class)' },
-  { day: 'Thu', fullName: 'Thursday', defaultPlan: 'Scenario B (Tue/Thu Class)' },
-  { day: 'Fri', fullName: 'Friday', defaultPlan: 'Weekend / Non-Class Prep' },
-  { day: 'Sat', fullName: 'Saturday', defaultPlan: 'Weekend / Non-Class Prep' },
-  { day: 'Sun', fullName: 'Sunday', defaultPlan: 'Weekend / Non-Class Prep' },
-];
 
 export default function DietHub() {
   const [activeSection, setActiveSection] = useState('schedule');
   const [expandedRecipe, setExpandedRecipe] = useState(null);
-  const [currentRotation, setCurrentRotation] = useState(getProteinRotation());
-  const [selectedDayName, setSelectedDayName] = useState('Wed');
+  const [currentRotation, setCurrentRotation] = useState(getProteinRotation);
+  const [selectedDayName, setSelectedDayName] = useState(() => getDayName(getLocalDateString()));
   const [customDayPlans, setCustomDayPlans] = useState({});
 
-  const currentDayConfig = WEEKDAYS.find(w => w.day === selectedDayName) || WEEKDAYS[2];
+  const currentDayConfig = WEEKDAYS.find(w => w.day === selectedDayName) || WEEKDAYS[3];
   const activePlanName = customDayPlans[selectedDayName] || currentDayConfig.defaultPlan;
   const timetable = MEAL_TIMETABLES_MAP[activePlanName] || MEAL_TIMETABLE_SCENARIO_A;
+
+  const dayTotals = timetable.reduce(
+    (acc, meal) => ({
+      cals: acc.cals + (parseInt(meal.cals) || 0),
+      protein: acc.protein + (parseInt(meal.protein) || 0)
+    }),
+    { cals: 0, protein: 0 }
+  );
 
   const sections = [
     { id: 'schedule', label: 'Meal Schedule' },
@@ -130,6 +128,18 @@ export default function DietHub() {
                 </div>
               </div>
             ))}
+
+            {/* Plan totals — makes it obvious whether the day's plan reaches the targets */}
+            <div className="flex items-center gap-4 p-4 border-t border-slate-200/60 bg-slate-50/60">
+              <div className="w-10 shrink-0" />
+              <p className="flex-1 text-xs font-extrabold text-slate-500 uppercase tracking-wider">Plan Total</p>
+              <div className="text-right shrink-0">
+                <p className={`text-sm font-extrabold ${dayTotals.protein >= 150 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                  {dayTotals.protein}g / 150g
+                </p>
+                <p className="text-[10px] text-slate-400 font-medium">{dayTotals.cals.toLocaleString()} / 2,800 kcal</p>
+              </div>
+            </div>
           </div>
 
           {/* Pre-workout Carbs */}

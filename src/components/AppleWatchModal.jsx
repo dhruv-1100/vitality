@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { Watch, X, Check } from 'lucide-react';
-import { getAppleWatchLogForDate, saveAppleWatchLog } from '../utils/storage';
+import { getAppleWatchLogForDate, saveAppleWatchLog, APPLE_WATCH_PLACEHOLDERS } from '../utils/storage';
 
 export default function AppleWatchModal({ activeDate, onClose, onSaved }) {
-  const current = getAppleWatchLogForDate(activeDate);
-  const [form, setForm] = useState({
-    totalCalories: current.totalCalories || 2450,
-    activeCalories: current.activeCalories || 720,
-    workoutCalories: current.workoutCalories || 450,
-    workoutActiveCalories: current.workoutActiveCalories || 390,
-    restingHeartRate: current.restingHeartRate || 62,
-    workoutAvgHeartRate: current.workoutAvgHeartRate || 138,
-    stepCount: current.stepCount || 8450,
-    sleepHours: current.sleepHours || 7.5,
+  const [form, setForm] = useState(() => {
+    const current = getAppleWatchLogForDate(activeDate);
+    // A day with no entry starts from typical values as a starting point to edit;
+    // an existing entry is shown exactly as it was saved.
+    return Object.fromEntries(
+      Object.keys(APPLE_WATCH_PLACEHOLDERS).map(key => [
+        key,
+        current.logged && typeof current[key] === 'number' ? current[key] : APPLE_WATCH_PLACEHOLDERS[key]
+      ])
+    );
   });
   const [saved, setSaved] = useState(false);
 

@@ -9,6 +9,29 @@ const ROTATION_KEY = 'transformation_protein_rotation_v1';
 const SCENARIO_KEY = 'transformation_meal_scenario_v1';
 const CHECKLIST_KEY = 'transformation_daily_checklist_v1';
 const APPLE_WATCH_KEY = 'transformation_apple_watch_v1';
+const GROCERY_CUSTOM_KEY = 'transformation_grocery_custom_items_v1';
+
+// Every read goes through this so a corrupt or partially written entry
+// degrades to the fallback instead of throwing on render.
+const readJSON = (key, fallback) => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    const parsed = JSON.parse(raw);
+    return parsed === null || parsed === undefined ? fallback : parsed;
+  } catch (e) {
+    return fallback;
+  }
+};
+
+const writeJSON = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    // Quota exceeded or storage disabled — keep the in-memory value usable.
+  }
+  return value;
+};
 
 // Seed weekly weigh-in entries (Week 1 starting July 30 / Aug 2)
 const SEED_WEEKLY_WEIGHTS = [
@@ -22,6 +45,15 @@ export const getLocalDateString = (d = new Date()) => {
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
+
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+// Parsed at midday so a UTC offset can never shift the calendar day.
+export const parseLocalDate = (dateStr) => new Date(`${dateStr}T12:00:00`);
+
+export const getDayName = (dateStr) => DAY_NAMES[parseLocalDate(dateStr).getDay()];
+
+export const isSunday = (dateStr) => parseLocalDate(dateStr).getDay() === 0;
 
 const SEED_WORKOUT_LOGS = {};
 
@@ -39,16 +71,11 @@ const SEED_APPLE_WATCH_LOGS = {
 };
 
 export const getWeeklyWeightLogs = () => {
-  const data = localStorage.getItem(WEEKLY_WEIGHT_KEY);
-  if (!data) {
-    localStorage.setItem(WEEKLY_WEIGHT_KEY, JSON.stringify(SEED_WEEKLY_WEIGHTS));
-    return SEED_WEEKLY_WEIGHTS;
+  if (localStorage.getItem(WEEKLY_WEIGHT_KEY) === null) {
+    return writeJSON(WEEKLY_WEIGHT_KEY, SEED_WEEKLY_WEIGHTS);
   }
-  try {
-    return JSON.parse(data);
-  } catch (e) {
-    return SEED_WEEKLY_WEIGHTS;
-  }
+  const logs = readJSON(WEEKLY_WEIGHT_KEY, SEED_WEEKLY_WEIGHTS);
+  return Array.isArray(logs) ? logs : SEED_WEEKLY_WEIGHTS;
 };
 
 export const saveWeeklyWeightLog = (logEntry) => {
@@ -62,29 +89,24 @@ export const saveWeeklyWeightLog = (logEntry) => {
     updated = [...logs, logEntry];
   }
   updated.sort((a, b) => a.weekNum - b.weekNum);
-  localStorage.setItem(WEEKLY_WEIGHT_KEY, JSON.stringify(updated));
-  return updated;
+  return writeJSON(WEEKLY_WEIGHT_KEY, updated);
 };
 
 export const getWorkoutLogs = () => {
-  const data = localStorage.getItem(WORKOUT_KEY);
-  let logs = {};
-  if (data) {
-    try { logs = JSON.parse(data); } catch (e) { logs = {}; }
-  }
+  const logs = readJSON(WORKOUT_KEY, {});
 
   // Auto-migration 1: Move errant 2026-07-31 workout log to 2026-07-30
   if (logs['2026-07-31'] && logs['2026-07-31'].routineName === 'Legs A' && !logs['2026-07-30']) {
     logs['2026-07-30'] = { ...logs['2026-07-31'], date: '2026-07-30' };
     delete logs['2026-07-31'];
-    localStorage.setItem(WORKOUT_KEY, JSON.stringify(logs));
+    writeJSON(WORKOUT_KEY, logs);
   }
 
   // Auto-migration 2: Move errant 2026-08-01 Push workout log to 2026-07-31
   if (logs['2026-08-01'] && !logs['2026-07-31']) {
     logs['2026-07-31'] = { ...logs['2026-08-01'], date: '2026-07-31', routineName: 'Push B' };
     delete logs['2026-08-01'];
-    localStorage.setItem(WORKOUT_KEY, JSON.stringify(logs));
+    writeJSON(WORKOUT_KEY, logs);
   }
 
   return logs;
@@ -93,73 +115,77 @@ export const getWorkoutLogs = () => {
 export const saveWorkoutLog = (date, workoutData) => {
   const logs = getWorkoutLogs();
   logs[date] = workoutData;
-  localStorage.setItem(WORKOUT_KEY, JSON.stringify(logs));
-  
+  writeJSON(WORKOUT_KEY, logs);
+
   if (workoutData.completed) {
     const completedDays = getCompletedCalendarDays();
     if (!completedDays.includes(date)) {
-      completedDays.push(date);
-      localStorage.setItem(CALENDAR_KEY, JSON.stringify(completedDays));
+      writeJSON(CALENDAR_KEY, [...completedDays, date]);
     }
   }
   return logs;
 };
 
-export const getAppleWatchLogs = () => {
-  const data = localStorage.getItem(APPLE_WATCH_KEY);
-  if (!data) {
-    localStorage.setItem(APPLE_WATCH_KEY, JSON.stringify(SEED_APPLE_WATCH_LOGS));
-    return SEED_APPLE_WATCH_LOGS;
-  }
-  try {
-    return JSON.parse(data);
-  } catch (e) {
-    return SEED_APPLE_WATCH_LOGS;
-  }
+// Persists in-progress sets without marking the session complete, so leaving
+// the tab mid-workout no longer discards everything typed so far.
+export const saveWorkoutDraft = (date, draft) => {
+  const logs = getWorkoutLogs();
+  const existing = logs[date] || {};
+  logs[date] = { ...existing, ...draft, date };
+  return writeJSON(WORKOUT_KEY, logs);
 };
 
+export const getAppleWatchLogs = () => {
+  if (localStorage.getItem(APPLE_WATCH_KEY) === null) {
+    return writeJSON(APPLE_WATCH_KEY, SEED_APPLE_WATCH_LOGS);
+  }
+  return readJSON(APPLE_WATCH_KEY, SEED_APPLE_WATCH_LOGS);
+};
+
+// Values used to prefill the telemetry form for a day that has no entry yet.
+// They are suggestions for the input, never displayed as if they were measured.
+export const APPLE_WATCH_PLACEHOLDERS = {
+  totalCalories: 2450,
+  activeCalories: 720,
+  workoutCalories: 450,
+  workoutActiveCalories: 390,
+  restingHeartRate: 62,
+  workoutAvgHeartRate: 138,
+  stepCount: 8450,
+  sleepHours: 7.5
+};
+
+const WATCH_METRICS = Object.keys(APPLE_WATCH_PLACEHOLDERS);
+
 export const getAppleWatchLogForDate = (date) => {
-  const logs = getAppleWatchLogs();
-  const raw = logs[date] || {};
-  return {
-    totalCalories: raw.totalCalories || 2450,
-    activeCalories: raw.activeCalories || raw.dailyActiveCalories || 720,
-    workoutCalories: raw.workoutCalories || 450,
-    workoutActiveCalories: raw.workoutActiveCalories || 390,
-    restingHeartRate: raw.restingHeartRate || 62,
-    workoutAvgHeartRate: raw.workoutAvgHeartRate || 138,
-    stepCount: raw.stepCount || 8450,
-    sleepHours: raw.sleepHours || 7.5
-  };
+  const raw = getAppleWatchLogs()[date];
+  if (!raw) return { logged: false };
+
+  const entry = { logged: true };
+  WATCH_METRICS.forEach(key => {
+    const value = key === 'activeCalories' ? (raw.activeCalories ?? raw.dailyActiveCalories) : raw[key];
+    entry[key] = typeof value === 'number' ? value : null;
+  });
+  return entry;
 };
 
 export const saveAppleWatchLog = (date, watchData) => {
   const logs = getAppleWatchLogs();
   logs[date] = { ...logs[date], ...watchData };
-  localStorage.setItem(APPLE_WATCH_KEY, JSON.stringify(logs));
-  return logs;
+  return writeJSON(APPLE_WATCH_KEY, logs);
 };
 
 export const getCompletedCalendarDays = () => {
-  const data = localStorage.getItem(CALENDAR_KEY);
-  let days = [];
-  if (data) {
-    try { days = JSON.parse(data); } catch (e) { days = []; }
-  }
+  let days = readJSON(CALENDAR_KEY, []);
+  if (!Array.isArray(days)) days = [];
 
   // Migration: Ensure 2026-07-30 and 2026-07-31 are completed if workout logs exist, and clean up errant 2026-08-01 completion
   const MIGRATION_KEY = 'transformation_aug01_migration_v3';
   if (!localStorage.getItem(MIGRATION_KEY)) {
-    if (days.includes('2026-08-01')) {
-      days = days.filter(d => d !== '2026-08-01');
-    }
-    if (!days.includes('2026-07-31')) {
-      days.push('2026-07-31');
-    }
-    if (!days.includes('2026-07-30')) {
-      days.push('2026-07-30');
-    }
-    localStorage.setItem(CALENDAR_KEY, JSON.stringify(days));
+    days = days.filter(d => d !== '2026-08-01');
+    if (!days.includes('2026-07-31')) days.push('2026-07-31');
+    if (!days.includes('2026-07-30')) days.push('2026-07-30');
+    writeJSON(CALENDAR_KEY, days);
     localStorage.setItem(MIGRATION_KEY, 'done');
   }
 
@@ -168,54 +194,61 @@ export const getCompletedCalendarDays = () => {
 
 export const toggleCalendarDayCompleted = (date) => {
   const days = getCompletedCalendarDays();
-  let updated;
-  if (days.includes(date)) {
-    updated = days.filter(d => d !== date);
-  } else {
-    updated = [...days, date];
-  }
-  localStorage.setItem(CALENDAR_KEY, JSON.stringify(updated));
-  return updated;
+  const updated = days.includes(date) ? days.filter(d => d !== date) : [...days, date];
+  return writeJSON(CALENDAR_KEY, updated);
 };
 
 const SLOT_SWAPS_KEY = 'transformation_slot_swaps_v1';
 
-export const getMealChecks = () => {
-  const data = localStorage.getItem(MEALS_KEY);
-  return data ? JSON.parse(data) : {};
-};
+export const getMealChecks = () => readJSON(MEALS_KEY, {});
 
 export const saveMealCheck = (date, mealIdx, isChecked) => {
   const checks = getMealChecks();
   if (!checks[date]) checks[date] = {};
   checks[date][mealIdx] = isChecked;
-  localStorage.setItem(MEALS_KEY, JSON.stringify(checks));
-  return checks;
+  return writeJSON(MEALS_KEY, checks);
 };
 
-export const getSlotSwaps = () => {
-  const data = localStorage.getItem(SLOT_SWAPS_KEY);
-  return data ? JSON.parse(data) : {};
-};
+export const getSlotSwaps = () => readJSON(SLOT_SWAPS_KEY, {});
 
 export const saveSlotSwap = (date, slotIdx, mealObj) => {
   const swaps = getSlotSwaps();
   if (!swaps[date]) swaps[date] = {};
   swaps[date][slotIdx] = mealObj;
-  localStorage.setItem(SLOT_SWAPS_KEY, JSON.stringify(swaps));
-  return swaps;
+  return writeJSON(SLOT_SWAPS_KEY, swaps);
 };
 
-export const getGroceryChecks = () => {
-  const data = localStorage.getItem(GROCERY_KEY);
-  return data ? JSON.parse(data) : {};
-};
+export const getGroceryChecks = () => readJSON(GROCERY_KEY, {});
 
 export const toggleGroceryItem = (itemText) => {
   const checks = getGroceryChecks();
   checks[itemText] = !checks[itemText];
-  localStorage.setItem(GROCERY_KEY, JSON.stringify(checks));
-  return checks;
+  return writeJSON(GROCERY_KEY, checks);
+};
+
+export const getCustomGroceryItems = () => {
+  const items = readJSON(GROCERY_CUSTOM_KEY, []);
+  return Array.isArray(items) ? items : [];
+};
+
+export const addCustomGroceryItem = (itemText) => {
+  const items = getCustomGroceryItems();
+  const trimmed = itemText.trim();
+  if (!trimmed || items.includes(trimmed)) return items;
+  return writeJSON(GROCERY_CUSTOM_KEY, [...items, trimmed]);
+};
+
+export const removeCustomGroceryItem = (itemText) => {
+  const remaining = getCustomGroceryItems().filter(i => i !== itemText);
+  writeJSON(GROCERY_CUSTOM_KEY, remaining);
+
+  // Drop the orphaned check so a re-added item does not come back pre-ticked.
+  const checks = getGroceryChecks();
+  if (itemText in checks) {
+    delete checks[itemText];
+    writeJSON(GROCERY_KEY, checks);
+  }
+  return remaining;
 };
 
 export const getProteinRotation = () => {
@@ -237,17 +270,14 @@ export const setMealScenario = (scenario) => {
 };
 
 export const getDailyChecklist = (date) => {
-  const data = localStorage.getItem(CHECKLIST_KEY);
-  const all = data ? JSON.parse(data) : {};
-  return all[date] || { creatine: false, b12: false, d3: false, omega3: false, waterLitres: 0 };
+  const all = readJSON(CHECKLIST_KEY, {});
+  return all[date] || { creatine: false, b12: false, d3: false, waterLitres: 0 };
 };
 
 export const saveDailyChecklist = (date, checklist) => {
-  const data = localStorage.getItem(CHECKLIST_KEY);
-  const all = data ? JSON.parse(data) : {};
+  const all = readJSON(CHECKLIST_KEY, {});
   all[date] = checklist;
-  localStorage.setItem(CHECKLIST_KEY, JSON.stringify(all));
-  return all;
+  return writeJSON(CHECKLIST_KEY, all);
 };
 
 export const exportUserData = () => {
@@ -257,7 +287,10 @@ export const exportUserData = () => {
     appleWatch: getAppleWatchLogs(),
     completedCalendar: getCompletedCalendarDays(),
     mealChecks: getMealChecks(),
+    slotSwaps: getSlotSwaps(),
+    dailyChecklists: readJSON(CHECKLIST_KEY, {}),
     groceryChecks: getGroceryChecks(),
+    groceryCustomItems: getCustomGroceryItems(),
     rotation: getProteinRotation(),
     scenario: getMealScenario(),
     exportDate: new Date().toISOString()
@@ -266,18 +299,28 @@ export const exportUserData = () => {
 };
 
 export const importUserData = (jsonString) => {
+  let data;
   try {
-    const data = JSON.parse(jsonString);
-    if (data.weeklyWeights) localStorage.setItem(WEEKLY_WEIGHT_KEY, JSON.stringify(data.weeklyWeights));
-    if (data.workouts) localStorage.setItem(WORKOUT_KEY, JSON.stringify(data.workouts));
-    if (data.appleWatch) localStorage.setItem(APPLE_WATCH_KEY, JSON.stringify(data.appleWatch));
-    if (data.completedCalendar) localStorage.setItem(CALENDAR_KEY, JSON.stringify(data.completedCalendar));
-    if (data.mealChecks) localStorage.setItem(MEALS_KEY, JSON.stringify(data.mealChecks));
-    if (data.groceryChecks) localStorage.setItem(GROCERY_KEY, JSON.stringify(data.groceryChecks));
-    if (data.rotation) localStorage.setItem(ROTATION_KEY, data.rotation);
-    if (data.scenario) localStorage.setItem(SCENARIO_KEY, data.scenario);
-    return true;
+    data = JSON.parse(jsonString);
   } catch (e) {
     return false;
   }
+  if (!data || typeof data !== 'object') return false;
+
+  const restore = (value, key) => {
+    if (value !== undefined && value !== null) writeJSON(key, value);
+  };
+
+  restore(data.weeklyWeights, WEEKLY_WEIGHT_KEY);
+  restore(data.workouts, WORKOUT_KEY);
+  restore(data.appleWatch, APPLE_WATCH_KEY);
+  restore(data.completedCalendar, CALENDAR_KEY);
+  restore(data.mealChecks, MEALS_KEY);
+  restore(data.slotSwaps, SLOT_SWAPS_KEY);
+  restore(data.dailyChecklists, CHECKLIST_KEY);
+  restore(data.groceryChecks, GROCERY_KEY);
+  restore(data.groceryCustomItems, GROCERY_CUSTOM_KEY);
+  if (data.rotation) localStorage.setItem(ROTATION_KEY, data.rotation);
+  if (data.scenario) localStorage.setItem(SCENARIO_KEY, data.scenario);
+  return true;
 };

@@ -1,39 +1,104 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Play, Pause, RotateCcw } from 'lucide-react';
+import { X, Play, Pause, RotateCcw, Plus } from 'lucide-react';
+
+// Turns the routine's human-readable rest ("90 sec", "2-3 min", "3 min") into
+// seconds. Range values resolve to the lower bound so the timer never overshoots.
+export const parseRestToSeconds = (rest, fallback = 120) => {
+  if (typeof rest === 'number' && Number.isFinite(rest)) return Math.max(1, Math.round(rest));
+  if (typeof rest !== 'string') return fallback;
+
+  const amount = parseFloat(rest);
+  if (!Number.isFinite(amount) || amount <= 0) return fallback;
+
+  const isMinutes = /min/i.test(rest);
+  return Math.max(1, Math.round(isMinutes ? amount * 60 : amount));
+};
+
+// Short two-tone chime built with the Web Audio API — no asset to ship or fail to load.
+const playChime = () => {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    [880, 1320].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const start = ctx.currentTime + i * 0.18;
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.25, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.16);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.18);
+    });
+    setTimeout(() => ctx.close(), 800);
+  } catch (e) {
+    // Audio is a nicety; a blocked or unsupported context must not break the timer.
+  }
+};
 
 export default function RestTimerModal({ seconds = 120, onClose }) {
+  const [duration, setDuration] = useState(seconds);
   const [remaining, setRemaining] = useState(seconds);
   const [running, setRunning] = useState(true);
-  const intervalRef = useRef(null);
+  const chimedRef = useRef(false);
+
+  // Restart cleanly whenever the caller opens the timer for a different exercise.
+  useEffect(() => {
+    setDuration(seconds);
+    setRemaining(seconds);
+    setRunning(true);
+    chimedRef.current = false;
+  }, [seconds]);
+
+  // One interval per run/pause transition — the tick reads the previous value,
+  // so it never resubscribes each second or drifts.
+  useEffect(() => {
+    if (!running) return undefined;
+    const id = setInterval(() => setRemaining(r => (r <= 0 ? 0 : r - 1)), 1000);
+    return () => clearInterval(id);
+  }, [running]);
 
   useEffect(() => {
-    if (running && remaining > 0) {
-      intervalRef.current = setInterval(() => setRemaining(r => r - 1), 1000);
-    }
-    return () => clearInterval(intervalRef.current);
-  }, [running, remaining]);
-
-  useEffect(() => {
-    if (remaining <= 0) {
-      clearInterval(intervalRef.current);
-      try { new Audio('data:audio/wav;base64,UklGRl9vT19teleW...').play(); } catch (e) {}
-    }
+    if (remaining > 0 || chimedRef.current) return;
+    chimedRef.current = true;
+    setRunning(false);
+    playChime();
   }, [remaining]);
 
+  const restart = (newDuration = duration) => {
+    setDuration(newDuration);
+    setRemaining(newDuration);
+    setRunning(true);
+    chimedRef.current = false;
+  };
+
+  const addTime = (delta) => {
+    setRemaining(r => Math.max(0, r + delta));
+    setDuration(d => Math.max(d, remaining + delta));
+    if (remaining + delta > 0) {
+      chimedRef.current = false;
+      setRunning(true);
+    }
+  };
+
+  const done = remaining <= 0;
   const mins = Math.floor(remaining / 60);
   const secs = remaining % 60;
-  const pct = seconds > 0 ? ((seconds - remaining) / seconds) * 100 : 100;
+  const pct = duration > 0 ? ((duration - remaining) / duration) * 100 : 100;
 
   const r = 54;
   const c = 2 * Math.PI * r;
-  const offset = c - (pct / 100) * c;
+  const offset = c - (Math.min(100, pct) / 100) * c;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/25 backdrop-blur-sm animate-fade-in">
-      <div className="card max-w-xs w-full p-8 text-center animate-scale-in" style={{ boxShadow: 'var(--shadow-modal)' }}>
+      <div className="card max-w-xs w-full !p-8 text-center animate-scale-in" style={{ boxShadow: 'var(--shadow-modal)' }}>
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-base font-bold text-gray-900">Rest Timer</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+          <h3 className="text-base font-bold text-slate-900 font-display">Rest Timer</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-black/5 text-slate-400" title="Close">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -41,37 +106,53 @@ export default function RestTimerModal({ seconds = 120, onClose }) {
         {/* Ring */}
         <div className="relative w-32 h-32 mx-auto mb-6">
           <svg width="128" height="128" className="-rotate-90">
-            <circle cx="64" cy="64" r={r} fill="none" stroke="#f0f0f0" strokeWidth="10" />
-            <circle cx="64" cy="64" r={r} fill="none" stroke={remaining <= 0 ? '#22c55e' : '#38bdf8'} strokeWidth="10" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={offset} className="transition-all duration-1000 ease-linear" />
+            <circle cx="64" cy="64" r={r} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="10" />
+            <circle
+              cx="64" cy="64" r={r} fill="none"
+              stroke={done ? '#22c55e' : '#38bdf8'}
+              strokeWidth="10" strokeLinecap="round"
+              strokeDasharray={c} strokeDashoffset={offset}
+              className="transition-all duration-1000 ease-linear"
+            />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-bold text-gray-900 tabular-nums">
+            <span className="text-3xl font-extrabold text-slate-900 tabular-nums font-display">
               {mins}:{secs.toString().padStart(2, '0')}
             </span>
-            <span className="text-xs text-gray-400">{remaining <= 0 ? 'Done!' : 'remaining'}</span>
+            <span className="text-xs text-slate-400 font-semibold">{done ? 'Done!' : 'remaining'}</span>
           </div>
         </div>
 
         {/* Controls */}
         <div className="flex items-center justify-center gap-3">
           <button
-            onClick={() => setRunning(!running)}
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-              running ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+            onClick={() => (done ? restart() : setRunning(!running))}
+            disabled={done}
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer disabled:opacity-40 disabled:cursor-default ${
+              running ? 'bg-black/5 text-slate-600 hover:bg-black/10' : 'bg-sky-500/10 text-sky-600 hover:bg-sky-500/20'
             }`}
+            title={running ? 'Pause' : 'Resume'}
           >
             {running ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
           </button>
           <button
-            onClick={() => { setRemaining(seconds); setRunning(true); }}
-            className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center transition-all"
+            onClick={() => restart()}
+            className="w-12 h-12 rounded-full bg-black/5 text-slate-600 hover:bg-black/10 flex items-center justify-center transition-all cursor-pointer"
+            title="Restart"
           >
             <RotateCcw className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => addTime(30)}
+            className="w-12 h-12 rounded-full bg-black/5 text-slate-600 hover:bg-black/10 flex items-center justify-center transition-all cursor-pointer text-xs font-extrabold"
+            title="Add 30 seconds"
+          >
+            +30s
           </button>
         </div>
 
         <button onClick={onClose} className="btn-primary w-full mt-6">
-          Skip & Continue
+          {done ? 'Next Set' : 'Skip & Continue'}
         </button>
       </div>
     </div>

@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
-import { Compass, CheckCircle2, Circle, ArrowRight, Dumbbell, Utensils, Scale, Watch, Sparkles, ShieldCheck, Zap, Calendar, ChefHat } from 'lucide-react';
-import { AUGUST_CALENDAR, MEAL_TIMETABLES_MAP } from '../utils/transformationData';
-import { getLocalDateString } from '../utils/storage';
+import { ArrowRight, Dumbbell, Utensils, Scale, Watch, ShieldCheck, Zap, Calendar } from 'lucide-react';
+import { AUGUST_CALENDAR } from '../utils/transformationData';
+import { getLocalDateString, parseLocalDate, getDayName, isSunday as isSundayDate } from '../utils/storage';
 
 export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
-  const [selectedDate, setSelectedDate] = useState('2026-07-30');
+  const [selectedDate, setSelectedDate] = useState(getLocalDateString);
   const [completedSteps, setCompletedSteps] = useState({});
 
+  // Dates outside the scripted August block still get a coherent plan derived
+  // from the real weekday rather than a fixed Thursday placeholder.
+  const dayName = getDayName(selectedDate);
   const dayCalendar = AUGUST_CALENDAR.find(c => c.date === selectedDate) || {
     date: selectedDate,
-    dayName: 'Thu',
-    session: 'Legs A',
+    dayName,
+    session: isSundayDate(selectedDate) ? 'Rest' : 'Push A',
     weekNum: 1,
     rpe: 'RPE 6-7',
-    notes: 'Execute workout session with high technical quality.'
+    notes: 'Outside the scripted August block — execute the session with high technical quality.'
   };
 
   const isRest = dayCalendar.session === 'Rest';
-  const isSunday = dayCalendar.dayName === 'Sun';
-  const dateObj = new Date(selectedDate + 'T12:00:00');
-  const dateLabel = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const isSunday = isSundayDate(selectedDate);
+  const dateLabel = parseLocalDate(selectedDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const isToday = selectedDate === getLocalDateString();
 
   const toggleStep = (id) => {
     setCompletedSteps(prev => ({ ...prev, [id]: !prev[id] }));
@@ -100,6 +103,11 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
             <Calendar className="w-4 h-4 text-emerald-600" />
             <span>Select Date:</span>
           </label>
+          {!isToday && (
+            <button onClick={() => setSelectedDate(getLocalDateString())} className="btn-secondary !py-2 !px-3 !text-xs">
+              Today
+            </button>
+          )}
           <input
             type="date"
             value={selectedDate}
