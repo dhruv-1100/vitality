@@ -9,7 +9,7 @@
 
    The Tailwind palette scales below are deliberately remapped
    onto warm equivalents: the app addresses colour through
-   utilities like `text-emerald-600` in ~250 places, so
+   utilities like `text-emerald-600` in 500+ places, so
    retuning the ramps keeps every surface on-palette without
    rewriting each class. Names are kept as roles:
      emerald/green -> clay   (primary brand)
