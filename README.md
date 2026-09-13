@@ -64,9 +64,35 @@ index.html  →  src/main.jsx  →  src/App.jsx
 
 `App.jsx` holds two pieces of state — the active tab and the selected routine — and
 swaps components in. There is no router; navigation is state, so the URL never changes.
+Analytics is lazy-loaded, because Chart.js is most of the bundle and is only needed on
+that one tab.
 
 Every component reads and writes through `src/utils/storage.js`. Nothing else touches
 `localStorage` directly.
+
+### The program engine
+
+The 21-week block is **generated**, not hand-written. `transformationData.js` derives
+`TRAINING_CALENDAR` from a weekly template — Push A / Pull A / Legs A midweek, two
+B-block sessions at the end of the week, Thursday and Sunday off — with the Friday and
+Saturday pair alternating on week parity. Week 1 is a bespoke Wednesday-to-Sunday
+lead-in, since the block starts mid-week.
+
+Two helpers turn a date into a position in the block, and the whole UI reads from them:
+
+| Helper | Returns |
+| --- | --- |
+| `getProgramWeek(date)` | Week 1–21. Weeks are Monday-anchored from 2026-08-03. |
+| `getPhaseForWeek(week)` | The phase whose `startWeek`/`endWeek` span that week |
+
+Nothing stores "which week is it" or "which phase is active" — both are computed from
+today's date, so the app cannot drift out of date. To change the split, edit
+`weeklyTemplate`; to change intensity, edit `rpeForWeek`.
+
+The August sessions were written by hand, and that copy is preserved verbatim in
+`CURATED_SESSIONS`, keyed by date. Those entries override the generated session, RPE,
+and notes — but the week number always comes from `getProgramWeek`, so the sequence
+stays internally consistent.
 
 ### Data model
 
@@ -169,7 +195,7 @@ src/
     AppleWatchModal.jsx     biometrics entry
   utils/
     storage.js              localStorage layer, date helpers, export/import
-    transformationData.js   routines, calendar, meal plans, groceries
+    transformationData.js   program engine, routines, meal plans, groceries
     foodDatabase.js         searchable food macros
     theme.js                colours for Chart.js and SVG
 ```
@@ -191,8 +217,8 @@ project subpath.
 - **The plan is personal.** Targets (59 → 66 kg, 2,800 kcal, 150 g protein,
   lacto-vegetarian, 5×/week PPL) and the schedule are hardcoded in
   `transformationData.js`. Adapting the app for someone else means editing that file.
-- **The calendar covers 2026-07-29 → 2026-08-31.** Dates outside that window fall back
-  to a plan derived from the weekday rather than a scripted session.
+- **The block runs 2026-07-29 → 2026-12-20** (21 weeks). The calendar is generated, not
+  hand-written: see the program engine below.
 - **Fonts load from Google Fonts.** Offline or on a restricted network, the app falls
   back to system serif/sans and stays fully usable.
 - **Apple Watch data is entered by hand.** There is no HealthKit integration; days with

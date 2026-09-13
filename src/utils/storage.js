@@ -55,8 +55,6 @@ export const getDayName = (dateStr) => DAY_NAMES[parseLocalDate(dateStr).getDay(
 
 export const isSunday = (dateStr) => parseLocalDate(dateStr).getDay() === 0;
 
-const SEED_WORKOUT_LOGS = {};
-
 const SEED_APPLE_WATCH_LOGS = {
   '2026-07-30': {
     totalCalories: 2550,
@@ -92,25 +90,7 @@ export const saveWeeklyWeightLog = (logEntry) => {
   return writeJSON(WEEKLY_WEIGHT_KEY, updated);
 };
 
-export const getWorkoutLogs = () => {
-  const logs = readJSON(WORKOUT_KEY, {});
-
-  // Auto-migration 1: Move errant 2026-07-31 workout log to 2026-07-30
-  if (logs['2026-07-31'] && logs['2026-07-31'].routineName === 'Legs A' && !logs['2026-07-30']) {
-    logs['2026-07-30'] = { ...logs['2026-07-31'], date: '2026-07-30' };
-    delete logs['2026-07-31'];
-    writeJSON(WORKOUT_KEY, logs);
-  }
-
-  // Auto-migration 2: Move errant 2026-08-01 Push workout log to 2026-07-31
-  if (logs['2026-08-01'] && !logs['2026-07-31']) {
-    logs['2026-07-31'] = { ...logs['2026-08-01'], date: '2026-07-31', routineName: 'Push B' };
-    delete logs['2026-08-01'];
-    writeJSON(WORKOUT_KEY, logs);
-  }
-
-  return logs;
-};
+export const getWorkoutLogs = () => readJSON(WORKOUT_KEY, {});
 
 export const saveWorkoutLog = (date, workoutData) => {
   const logs = getWorkoutLogs();
@@ -176,20 +156,8 @@ export const saveAppleWatchLog = (date, watchData) => {
 };
 
 export const getCompletedCalendarDays = () => {
-  let days = readJSON(CALENDAR_KEY, []);
-  if (!Array.isArray(days)) days = [];
-
-  // Migration: Ensure 2026-07-30 and 2026-07-31 are completed if workout logs exist, and clean up errant 2026-08-01 completion
-  const MIGRATION_KEY = 'transformation_aug01_migration_v3';
-  if (!localStorage.getItem(MIGRATION_KEY)) {
-    days = days.filter(d => d !== '2026-08-01');
-    if (!days.includes('2026-07-31')) days.push('2026-07-31');
-    if (!days.includes('2026-07-30')) days.push('2026-07-30');
-    writeJSON(CALENDAR_KEY, days);
-    localStorage.setItem(MIGRATION_KEY, 'done');
-  }
-
-  return days;
+  const days = readJSON(CALENDAR_KEY, []);
+  return Array.isArray(days) ? days : [];
 };
 
 export const toggleCalendarDayCompleted = (date) => {

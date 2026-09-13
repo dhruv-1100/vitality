@@ -24,7 +24,7 @@ export const PHASES = [
     effort: "RPE 6-7 (Wk 1) → RPE 8-9 (Wk 5)",
     focus: "Muscle memory window. Expect fast initial strength returns without rushing.",
     targetWeightKg: 60.5,
-    status: "active"
+    startWeek: 1, endWeek: 5
   },
   {
     id: "phase2",
@@ -34,7 +34,7 @@ export const PHASES = [
     effort: "RPE 8–9 (Consistently progressive)",
     focus: "Increase calories slightly if weight gain stalls. Maximum muscle growth phase.",
     targetWeightKg: 63.5,
-    status: "upcoming"
+    startWeek: 6, endWeek: 13
   },
   {
     id: "phase3",
@@ -44,7 +44,7 @@ export const PHASES = [
     effort: "RPE 8–9.5 (Heavy compound focus)",
     focus: "Lower rep range (5–6 reps) on main lifts (Squat, Bench, Row, OHP). Accessories stay high reps.",
     targetWeightKg: 64.5,
-    status: "upcoming"
+    startWeek: 14, endWeek: 17
   },
   {
     id: "phase4",
@@ -54,9 +54,14 @@ export const PHASES = [
     effort: "50% volume deload mid-month",
     focus: "Full reassessment for next phase into 2027.",
     targetWeightKg: 66.0,
-    status: "upcoming"
+    startWeek: 18, endWeek: 21
   }
 ];
+
+// Which phase a given program week falls in. Derived rather than stored,
+// so the app cannot drift out of date the way a frozen status flag did.
+export const getPhaseForWeek = (weekNum) =>
+  PHASES.find(p => weekNum >= p.startWeek && weekNum <= p.endWeek) || PHASES[PHASES.length - 1];
 
 export const WEIGHT_CHECKPOINTS = [
   { week: "Week 1", month: "Late July / Early Aug", targetKg: 59.3, note: "Baseline weigh-in & reacclimation setup" },
@@ -148,47 +153,151 @@ export const WORKOUT_ROUTINES = {
   }
 };
 
-// Starting from July 29 (Today - Rest Day)
-export const AUGUST_CALENDAR = [
-  { date: "2026-07-29", dayName: "Wed", session: "Rest", weekNum: 1, rpe: "-", notes: "Rest day & recovery. Hydrate and prepare for tomorrow." },
-  { date: "2026-07-30", dayName: "Thu", session: "Legs A", weekNum: 1, rpe: "RPE 6-7 (Re-acclimation)", notes: "Legs A session. Barbell squat primary movement. Leave 3-4 reps in reserve." },
-  { date: "2026-07-31", dayName: "Fri", session: "Push B", weekNum: 1, rpe: "RPE 6-7", notes: "Push B session. Overhead press & incline DB press focus." },
-  { date: "2026-08-01", dayName: "Sat", session: "Pull B", weekNum: 1, rpe: "RPE 6-7", notes: "Pull B session. Barbell row & bicep thickness focus." },
-  { date: "2026-08-02", dayName: "Sun", session: "Rest", weekNum: 1, rpe: "-", notes: "Weekly Weigh-In Day & Batch Cook Session 1." },
-  
-  { date: "2026-08-03", dayName: "Mon", session: "Push A", weekNum: 2, rpe: "RPE 7", notes: "Small load increase if form felt solid." },
-  { date: "2026-08-04", dayName: "Tue", session: "Pull A", weekNum: 2, rpe: "RPE 7", notes: "Anchor session. Still 2-3 reps in reserve." },
-  { date: "2026-08-05", dayName: "Wed", session: "Legs A", weekNum: 2, rpe: "RPE 7", notes: "Anchor session. Full set ranges starting now." },
-  { date: "2026-08-06", dayName: "Thu", session: "Rest", weekNum: 2, rpe: "-", notes: "Batch Cook Session 2 (Thu Prep)." },
-  { date: "2026-08-07", dayName: "Fri", session: "Legs B", weekNum: 2, rpe: "RPE 7", notes: "Bulgarian split squats & Hack squat focus." },
-  { date: "2026-08-08", dayName: "Sat", session: "Push B", weekNum: 2, rpe: "RPE 7", notes: "OHP compound focus." },
-  { date: "2026-08-09", dayName: "Sun", session: "Rest", weekNum: 2, rpe: "-", notes: "Weekly Weigh-In Day & Batch Cook Session 1." },
+// ============================================================
+// PROGRAM ENGINE
+// The block runs 21 weeks. Week 1 is a short Wed-Sun lead-in;
+// from Mon 3 Aug every week is Monday-anchored, which is what
+// getProgramWeek counts against.
+// ============================================================
 
-  { date: "2026-08-10", dayName: "Mon", session: "Push A", weekNum: 3, rpe: "RPE 7-8", notes: "Start pushing loads on main compounds." },
-  { date: "2026-08-11", dayName: "Tue", session: "Pull A", weekNum: 3, rpe: "RPE 7-8", notes: "Push Cable Row & Lat Pulldown." },
-  { date: "2026-08-12", dayName: "Wed", session: "Legs A", weekNum: 3, rpe: "RPE 7-8", notes: "Push Back Squat & RDL." },
-  { date: "2026-08-13", dayName: "Thu", session: "Rest", weekNum: 3, rpe: "-", notes: "Recovery & batch cook top-up." },
-  { date: "2026-08-14", dayName: "Fri", session: "Push B", weekNum: 3, rpe: "RPE 7-8", notes: "Heavy OHP focus." },
-  { date: "2026-08-15", dayName: "Sat", session: "Pull B", weekNum: 3, rpe: "RPE 7-8", notes: "Heavy Barbell Row focus." },
-  { date: "2026-08-16", dayName: "Sun", session: "Rest", weekNum: 3, rpe: "-", notes: "Weekly Weigh-In Day & Batch Cook Session 1." },
+export const PROGRAM_START = "2026-07-29";   // Wed - first session of the block
+const WEEK_TWO_MONDAY = "2026-08-03";        // weeks are Monday-anchored from here
+export const PROGRAM_WEEKS = 21;
 
-  { date: "2026-08-17", dayName: "Mon", session: "Push A", weekNum: 4, rpe: "RPE 8", notes: "Normal working intensity now. Add weight/reps!" },
-  { date: "2026-08-18", dayName: "Tue", session: "Pull A", weekNum: 4, rpe: "RPE 8", notes: "Add weight or rep over last week." },
-  { date: "2026-08-19", dayName: "Wed", session: "Legs A", weekNum: 4, rpe: "RPE 8", notes: "Push Squat and RDL hard." },
-  { date: "2026-08-20", dayName: "Thu", session: "Rest", weekNum: 4, rpe: "-", notes: "Batch Cook Session 2." },
-  { date: "2026-08-21", dayName: "Fri", session: "Legs B", weekNum: 4, rpe: "RPE 8", notes: "Quads & calves intensity." },
-  { date: "2026-08-22", dayName: "Sat", session: "Push B", weekNum: 4, rpe: "RPE 8", notes: "Push diamond push-ups to failure." },
-  { date: "2026-08-23", dayName: "Sun", session: "Rest", weekNum: 4, rpe: "-", notes: "Weekly Weigh-In Day & Batch Cook Session 1." },
+const asDate = (iso) => new Date(`${iso}T12:00:00`);
+const isoOf = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  { date: "2026-08-24", dayName: "Mon", session: "Push A", weekNum: 5, rpe: "RPE 8-9", notes: "Final week before Sep hypertrophy block!" },
-  { date: "2026-08-25", dayName: "Tue", session: "Pull A", weekNum: 5, rpe: "RPE 8-9", notes: "Push it hard." },
-  { date: "2026-08-26", dayName: "Wed", session: "Legs A", weekNum: 5, rpe: "RPE 8-9", notes: "Maximum effort squat session." },
-  { date: "2026-08-27", dayName: "Thu", session: "Rest", weekNum: 5, rpe: "-", notes: "Batch Cook Session 2." },
-  { date: "2026-08-28", dayName: "Fri", session: "Push B", weekNum: 5, rpe: "RPE 8-9", notes: "Peak Push B weight." },
-  { date: "2026-08-29", dayName: "Sat", session: "Pull B", weekNum: 5, rpe: "RPE 8-9", notes: "Peak Pull B weight." },
-  { date: "2026-08-30", dayName: "Sun", session: "Rest", weekNum: 5, rpe: "-", notes: "Weekly Weigh-In Day." },
-  { date: "2026-08-31", dayName: "Mon", session: "Push A", weekNum: 5, rpe: "RPE 8-9", notes: "Rolls straight into September Hypertrophy Block!" }
-];
+// Week number for any date in the block. Dates before the block start
+// report week 1; dates after it clamp to the final week.
+export const getProgramWeek = (dateStr) => {
+  const d = asDate(dateStr);
+  const anchor = asDate(WEEK_TWO_MONDAY);
+  if (d < anchor) return 1;
+  const weeksSince = Math.floor((d - anchor) / (7 * 24 * 60 * 60 * 1000));
+  return Math.min(PROGRAM_WEEKS, 2 + weeksSince);
+};
+
+// Steady-state split: Push A / Pull A / Legs A midweek, two B-block
+// sessions at the end of the week, Thursday and Sunday off. The Friday
+// and Saturday pair alternates with week parity.
+const weeklyTemplate = (weekNum) => {
+  const evenWeek = weekNum % 2 === 0;
+  return {
+    1: "Push A",
+    2: "Pull A",
+    3: "Legs A",
+    4: "Rest",
+    5: evenWeek ? "Legs B" : "Push B",
+    6: evenWeek ? "Push B" : "Pull B",
+    0: "Rest",
+  };
+};
+
+// Week 1 is bespoke - the block starts mid-week on a Wednesday.
+const WEEK_ONE = {
+  "2026-07-29": "Rest",
+  "2026-07-30": "Legs A",
+  "2026-07-31": "Push B",
+  "2026-08-01": "Pull B",
+  "2026-08-02": "Rest",
+};
+
+const rpeForWeek = (weekNum) => {
+  if (weekNum === 1) return "RPE 6-7 (Re-acclimation)";
+  if (weekNum === 2) return "RPE 7";
+  if (weekNum === 3) return "RPE 7-8";
+  if (weekNum === 4) return "RPE 8";
+  if (weekNum <= 13) return "RPE 8-9";
+  if (weekNum <= 17) return "RPE 8-9.5";
+  if (weekNum <= 19) return "RPE 8";
+  return "RPE 6-7 (Deload)";
+};
+
+const noteForSession = (session, weekNum, dayIdx) => {
+  if (session === "Rest") {
+    if (dayIdx === 0) return "Weekly Weigh-In Day & Batch Cook Session 1.";
+    return "Rest & recovery. Batch Cook Session 2 (Thu Prep).";
+  }
+  if (weekNum <= 5) return `${session} session. Build clean technique before adding load.`;
+  if (weekNum <= 13) return `${session} session. Hypertrophy block - add weight or a rep over last week.`;
+  if (weekNum <= 17) return `${session} session. Intensification - lower reps, heavier main lift.`;
+  if (weekNum <= 19) return `${session} session. Consolidate gains at steady load.`;
+  return `${session} session. Deload - roughly half the usual volume.`;
+};
+
+// The August sessions were written by hand; keep that copy verbatim and
+// generate everything from September onward. Week numbers always come
+// from getProgramWeek so the sequence stays internally consistent.
+const CURATED_SESSIONS = {
+  "2026-07-29": { session: "Rest", rpe: "-", notes: "Rest day & recovery. Hydrate and prepare for tomorrow." },
+  "2026-07-30": { session: "Legs A", rpe: "RPE 6-7 (Re-acclimation)", notes: "Legs A session. Barbell squat primary movement. Leave 3-4 reps in reserve." },
+  "2026-07-31": { session: "Push B", rpe: "RPE 6-7", notes: "Push B session. Overhead press & incline DB press focus." },
+  "2026-08-01": { session: "Pull B", rpe: "RPE 6-7", notes: "Pull B session. Barbell row & bicep thickness focus." },
+  "2026-08-02": { session: "Rest", rpe: "-", notes: "Weekly Weigh-In Day & Batch Cook Session 1." },
+  "2026-08-03": { session: "Push A", rpe: "RPE 7", notes: "Small load increase if form felt solid." },
+  "2026-08-04": { session: "Pull A", rpe: "RPE 7", notes: "Anchor session. Still 2-3 reps in reserve." },
+  "2026-08-05": { session: "Legs A", rpe: "RPE 7", notes: "Anchor session. Full set ranges starting now." },
+  "2026-08-06": { session: "Rest", rpe: "-", notes: "Batch Cook Session 2 (Thu Prep)." },
+  "2026-08-07": { session: "Legs B", rpe: "RPE 7", notes: "Bulgarian split squats & Hack squat focus." },
+  "2026-08-08": { session: "Push B", rpe: "RPE 7", notes: "OHP compound focus." },
+  "2026-08-09": { session: "Rest", rpe: "-", notes: "Weekly Weigh-In Day & Batch Cook Session 1." },
+  "2026-08-10": { session: "Push A", rpe: "RPE 7-8", notes: "Start pushing loads on main compounds." },
+  "2026-08-11": { session: "Pull A", rpe: "RPE 7-8", notes: "Push Cable Row & Lat Pulldown." },
+  "2026-08-12": { session: "Legs A", rpe: "RPE 7-8", notes: "Push Back Squat & RDL." },
+  "2026-08-13": { session: "Rest", rpe: "-", notes: "Recovery & batch cook top-up." },
+  "2026-08-14": { session: "Push B", rpe: "RPE 7-8", notes: "Heavy OHP focus." },
+  "2026-08-15": { session: "Pull B", rpe: "RPE 7-8", notes: "Heavy Barbell Row focus." },
+  "2026-08-16": { session: "Rest", rpe: "-", notes: "Weekly Weigh-In Day & Batch Cook Session 1." },
+  "2026-08-17": { session: "Push A", rpe: "RPE 8", notes: "Normal working intensity now. Add weight/reps!" },
+  "2026-08-18": { session: "Pull A", rpe: "RPE 8", notes: "Add weight or rep over last week." },
+  "2026-08-19": { session: "Legs A", rpe: "RPE 8", notes: "Push Squat and RDL hard." },
+  "2026-08-20": { session: "Rest", rpe: "-", notes: "Batch Cook Session 2." },
+  "2026-08-21": { session: "Legs B", rpe: "RPE 8", notes: "Quads & calves intensity." },
+  "2026-08-22": { session: "Push B", rpe: "RPE 8", notes: "Push diamond push-ups to failure." },
+  "2026-08-23": { session: "Rest", rpe: "-", notes: "Weekly Weigh-In Day & Batch Cook Session 1." },
+  "2026-08-24": { session: "Push A", rpe: "RPE 8-9", notes: "Final week before Sep hypertrophy block!" },
+  "2026-08-25": { session: "Pull A", rpe: "RPE 8-9", notes: "Push it hard." },
+  "2026-08-26": { session: "Legs A", rpe: "RPE 8-9", notes: "Maximum effort squat session." },
+  "2026-08-27": { session: "Rest", rpe: "-", notes: "Batch Cook Session 2." },
+  "2026-08-28": { session: "Push B", rpe: "RPE 8-9", notes: "Peak Push B weight." },
+  "2026-08-29": { session: "Pull B", rpe: "RPE 8-9", notes: "Peak Pull B weight." },
+  "2026-08-30": { session: "Rest", rpe: "-", notes: "Weekly Weigh-In Day." },
+  "2026-08-31": { session: "Push A", rpe: "RPE 8-9", notes: "Rolls straight into September Hypertrophy Block!" }
+};
+
+const buildCalendar = () => {
+  const days = [];
+  const cursor = asDate(PROGRAM_START);
+  const lastMonday = asDate(WEEK_TWO_MONDAY);
+  lastMonday.setDate(lastMonday.getDate() + (PROGRAM_WEEKS - 2) * 7);
+  const end = new Date(lastMonday);
+  end.setDate(end.getDate() + 6); // through the Sunday of the final week
+
+  while (cursor <= end) {
+    const date = isoOf(cursor);
+    const dayIdx = cursor.getDay();
+    const weekNum = getProgramWeek(date);
+    const generated = WEEK_ONE[date] || weeklyTemplate(weekNum)[dayIdx];
+    const curated = CURATED_SESSIONS[date];
+    const session = curated ? curated.session : generated;
+
+    days.push({
+      date,
+      dayName: DAY_NAMES[dayIdx],
+      session,
+      weekNum,
+      rpe: curated ? curated.rpe : (session === "Rest" ? "-" : rpeForWeek(weekNum)),
+      notes: curated ? curated.notes : noteForSession(session, weekNum, dayIdx),
+    });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return days;
+};
+
+export const TRAINING_CALENDAR = buildCalendar();
+
+export const PROGRAM_END = TRAINING_CALENDAR[TRAINING_CALENDAR.length - 1].date;
 
 export const MEAL_TIMETABLE_SCENARIO_A = [
   { time: "7:30 AM", meal: "Wake Up", detail: "Water, banana + black coffee", protein: "0g", cals: "100" },

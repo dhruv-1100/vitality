@@ -4,7 +4,7 @@ import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend, Filler } from 'chart.js';
 import { getWeeklyWeightLogs, getWorkoutLogs, getCompletedCalendarDays, getAppleWatchLogs, getLocalDateString, parseLocalDate } from '../utils/storage';
 import { COLORS } from '../utils/theme';
-import { WEIGHT_CHECKPOINTS, AUGUST_CALENDAR } from '../utils/transformationData';
+import { WEIGHT_CHECKPOINTS, TRAINING_CALENDAR } from '../utils/transformationData';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend, Filler);
 
@@ -30,7 +30,7 @@ export default function Analytics() {
   const completedWorkoutDates = new Set([
     ...Object.keys(workoutLogs).filter(k => workoutLogs[k]?.completed),
     ...completedCalendar.filter(d => {
-      const calItem = AUGUST_CALENDAR.find(c => c.date === d);
+      const calItem = TRAINING_CALENDAR.find(c => c.date === d);
       return calItem ? calItem.session !== 'Rest' : false;
     })
   ]);
@@ -40,7 +40,7 @@ export default function Analytics() {
   // scheduled up to today — dividing the running total by one week's target
   // let the figure climb past 100% and pin itself there.
   const todayStr = getLocalDateString();
-  const scheduledToDate = AUGUST_CALENDAR.filter(c => c.session !== 'Rest' && c.date <= todayStr).length;
+  const scheduledToDate = TRAINING_CALENDAR.filter(c => c.session !== 'Rest' && c.date <= todayStr).length;
   const adherenceRate = scheduledToDate > 0
     ? Math.min(100, Math.round((totalCompletedSessions / scheduledToDate) * 100))
     : 0;

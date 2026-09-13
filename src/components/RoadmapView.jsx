@@ -1,6 +1,7 @@
 import React from 'react';
 import { Map, Target, Zap, Award, RotateCcw } from 'lucide-react';
-import { PHASES } from '../utils/transformationData';
+import { PHASES, getProgramWeek, PROGRAM_WEEKS } from '../utils/transformationData';
+import { getLocalDateString } from '../utils/storage';
 
 const PHASE_ICONS = [Zap, Target, Award, RotateCcw];
 
@@ -12,7 +13,10 @@ const PHASE_COLORS = [
 ];
 
 export default function RoadmapView() {
-  const activeIndex = Math.max(0, PHASES.findIndex(p => p.status === 'active'));
+  // Derived from today rather than a stored flag, which silently went stale
+  // the moment the block moved past August.
+  const currentWeek = getProgramWeek(getLocalDateString());
+  const activeIndex = Math.max(0, PHASES.findIndex(p => currentWeek >= p.startWeek && currentWeek <= p.endWeek));
   const activePhase = PHASES[activeIndex];
 
   return (
@@ -34,7 +38,7 @@ export default function RoadmapView() {
               <p className="text-xs text-slate-400 font-medium">59 kg → 66 kg · 21 weeks</p>
             </div>
           </div>
-          <span className="pill pill-green text-xs font-bold">{activePhase?.name.split('—')[0].trim()} Active</span>
+          <span className="pill pill-green text-xs font-bold">Week {currentWeek} of {PROGRAM_WEEKS} &middot; {activePhase?.name.split('—')[0].trim()}</span>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -55,7 +59,7 @@ export default function RoadmapView() {
         {PHASES.map((phase, i) => {
           const Icon = PHASE_ICONS[i] || Target;
           const colors = PHASE_COLORS[i] || PHASE_COLORS[0];
-          const isActive = phase.status === 'active';
+          const isActive = i === activeIndex;
           const isDone = i < activeIndex;
 
           return (

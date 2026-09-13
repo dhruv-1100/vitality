@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CalendarDays, ChevronRight } from 'lucide-react';
-import { AUGUST_CALENDAR } from '../utils/transformationData';
+import { TRAINING_CALENDAR, PROGRAM_WEEKS, getProgramWeek, getPhaseForWeek } from '../utils/transformationData';
 import { getCompletedCalendarDays, toggleCalendarDayCompleted, getLocalDateString } from '../utils/storage';
 
 const SESSION_STYLES = {
@@ -16,12 +16,14 @@ const getSessionStyle = (session) => {
 };
 
 export default function WorkoutCalendar({ setActiveTab, setSelectedRoutine }) {
-  const [weekFilter, setWeekFilter] = useState(0);
+  const today = getLocalDateString();
+  const currentWeek = getProgramWeek(today);
+  // Open on the week actually in progress rather than dumping all 21 at once.
+  const [weekFilter, setWeekFilter] = useState(currentWeek);
   const [completedDays, setCompletedDays] = useState(getCompletedCalendarDays);
 
-  const today = getLocalDateString();
-  const weeks = [0, 1, 2, 3, 4, 5];
-  const filtered = weekFilter === 0 ? AUGUST_CALENDAR : AUGUST_CALENDAR.filter(d => d.weekNum === weekFilter);
+  const weeks = [0, ...Array.from({ length: PROGRAM_WEEKS }, (_, i) => i + 1)];
+  const filtered = weekFilter === 0 ? TRAINING_CALENDAR : TRAINING_CALENDAR.filter(d => d.weekNum === weekFilter);
 
   const trainingDays = filtered.filter(d => d.session !== 'Rest');
   const doneCount = trainingDays.filter(d => completedDays.includes(d.date)).length;
@@ -33,7 +35,7 @@ export default function WorkoutCalendar({ setActiveTab, setSelectedRoutine }) {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">Training Schedule</h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">August 2026 — Phase 1: Foundation</p>
+          <p className="text-sm text-slate-500 mt-1 font-medium">Week {currentWeek} of {PROGRAM_WEEKS} &middot; {getPhaseForWeek(currentWeek).name}</p>
         </div>
         <span className="pill pill-green text-xs font-bold">
           {doneCount} / {trainingDays.length} sessions complete

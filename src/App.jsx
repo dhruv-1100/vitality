@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import NextStepsView from './components/NextStepsView';
@@ -6,7 +6,9 @@ import WorkoutTracker from './components/WorkoutTracker';
 import WorkoutCalendar from './components/WorkoutCalendar';
 import DietHub from './components/DietHub';
 import GroceryList from './components/GroceryList';
-import Analytics from './components/Analytics';
+// Chart.js is ~40% of the bundle and is only needed on this tab, so it is
+// split out and fetched on first visit rather than on initial page load.
+const Analytics = lazy(() => import('./components/Analytics'));
 import RoadmapView from './components/RoadmapView';
 
 export default function App() {
@@ -44,7 +46,15 @@ export default function App() {
         )}
         {activeTab === 'diet' && <DietHub />}
         {activeTab === 'grocery' && <GroceryList />}
-        {activeTab === 'analytics' && <Analytics />}
+        {activeTab === 'analytics' && (
+          <Suspense fallback={
+            <div className="card !p-12 text-center text-sm font-medium text-slate-500">
+              Loading charts…
+            </div>
+          }>
+            <Analytics />
+          </Suspense>
+        )}
         {activeTab === 'roadmap' && <RoadmapView />}
       </main>
 
