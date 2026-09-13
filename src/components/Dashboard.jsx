@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Scale, Dumbbell, Utensils, Droplets, Pill, Flame, ArrowRight, Heart, Footprints, Moon, Watch, Plus, Info, Activity, Sparkles, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
-import { AUGUST_CALENDAR, MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLES_MAP, WEEKDAYS, getAlternativesForSlot } from '../utils/transformationData';
+import { TRAINING_CALENDAR, MEAL_TIMETABLE_SCENARIO_A, MEAL_TIMETABLES_MAP, WEEKDAYS, getAlternativesForSlot, getProgramWeek, getPhaseForWeek } from '../utils/transformationData';
 import { getWeeklyWeightLogs, saveWeeklyWeightLog, getMealChecks, saveMealCheck, getDailyChecklist, saveDailyChecklist, getAppleWatchLogForDate, getSlotSwaps, saveSlotSwap, getLocalDateString, parseLocalDate, getDayName, isSunday } from '../utils/storage';
 import { COLORS } from '../utils/theme';
 import AppleWatchModal from './AppleWatchModal';
@@ -8,7 +8,7 @@ import MealSlotEditor from './MealSlotEditor';
 
 export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
   const [selectedDate, setSelectedDate] = useState(getLocalDateString);
-  const [selectedWeekNum, setSelectedWeekNum] = useState(1);
+  const [weekOverride, setWeekOverride] = useState(null);
   const [weightInput, setWeightInput] = useState('59.3');
   const [waistInput, setWaistInput] = useState('29.1');
   const [weightNote, setWeightNote] = useState('');
@@ -22,7 +22,14 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
   const slotSwaps = getSlotSwaps();
   const dailyChecklist = getDailyChecklist(selectedDate);
   const watchData = getAppleWatchLogForDate(selectedDate);
-  const todayCalendar = AUGUST_CALENDAR.find(c => c.date === selectedDate) || { session: 'Rest', weekNum: 1, rpe: '-', notes: 'Recovery day' };
+  // Week and phase follow the selected date, so the header stays correct for
+  // every day of the block rather than reporting a frozen Week 1 / Phase 1.
+  const programWeek = getProgramWeek(selectedDate);
+  const activePhase = getPhaseForWeek(programWeek);
+  // The weigh-in week follows the selected date unless explicitly overridden.
+  const selectedWeekNum = weekOverride ?? programWeek;
+  const todayCalendar = TRAINING_CALENDAR.find(c => c.date === selectedDate)
+    || { session: 'Rest', weekNum: programWeek, rpe: '-', notes: 'Outside the program block — recovery day.' };
 
   // Weekday and its meal plan are derived from the picked date, so the day pills,
   // timetable, and Sunday-only cards can never disagree with the date shown.
@@ -156,13 +163,13 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
             {greeting} 👋
           </h1>
           <p className="text-sm text-slate-500 mt-1 font-medium">
-            {dateLabel} &middot; Week {todayCalendar.weekNum} &middot; Phase 1: Foundation
+            {dateLabel} &middot; Week {todayCalendar.weekNum} &middot; {activePhase.name}
           </p>
         </div>
         <div className="flex items-center gap-2">
           {!isToday && (
             <button
-              onClick={() => { setSelectedDate(getLocalDateString()); setOpenSwapIdx(null); }}
+              onClick={() => { setSelectedDate(getLocalDateString()); setOpenSwapIdx(null); setWeekOverride(null); }}
               className="btn-secondary !py-2.5 !px-4 !text-xs"
             >
               Jump to Today
@@ -171,7 +178,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
           <input
             type="date"
             value={selectedDate}
-            onChange={(e) => { setSelectedDate(e.target.value); setOpenSwapIdx(null); }}
+            onChange={(e) => { setSelectedDate(e.target.value); setOpenSwapIdx(null); setWeekOverride(null); }}
             className="input-field !w-auto text-sm"
           />
         </div>
@@ -316,7 +323,7 @@ export default function Dashboard({ setActiveTab, setSelectedRoutine }) {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div>
                     <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Week</label>
-                    <select value={selectedWeekNum} onChange={(e) => setSelectedWeekNum(parseInt(e.target.value))} className="input-field text-sm">
+                    <select value={selectedWeekNum} onChange={(e) => setWeekOverride(parseInt(e.target.value))} className="input-field text-sm">
                       {Array.from({ length: 21 }, (_, i) => i + 1).map(w => <option key={w} value={w}>Week {w}</option>)}
                     </select>
                   </div>

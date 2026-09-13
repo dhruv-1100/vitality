@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, Dumbbell, Utensils, Scale, Watch, ShieldCheck, Zap, Calendar } from 'lucide-react';
-import { AUGUST_CALENDAR } from '../utils/transformationData';
+import { TRAINING_CALENDAR } from '../utils/transformationData';
 import { getLocalDateString, parseLocalDate, getDayName, isSunday as isSundayDate } from '../utils/storage';
 
 export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
@@ -10,7 +10,7 @@ export default function NextStepsView({ setActiveTab, setSelectedRoutine }) {
   // Dates outside the scripted August block still get a coherent plan derived
   // from the real weekday rather than a fixed Thursday placeholder.
   const dayName = getDayName(selectedDate);
-  const dayCalendar = AUGUST_CALENDAR.find(c => c.date === selectedDate) || {
+  const dayCalendar = TRAINING_CALENDAR.find(c => c.date === selectedDate) || {
     date: selectedDate,
     dayName,
     session: isSundayDate(selectedDate) ? 'Rest' : 'Push A',
